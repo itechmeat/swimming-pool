@@ -1,0 +1,17 @@
+{
+  "projectName": "swimmingpool",
+  "version": "3.0",
+  "frontend": "javascript",
+  "javascript": {
+    "framework": "vue",
+    "config": {
+      "SourceDir": "src",
+      "DistributionDir": "dist/ssr",
+      "BuildCommand": "quasar build -m ssr",
+      "StartCommand": "quasar dev -m ssr"
+    }
+  },
+  "providers": [
+    "awscloudformation"
+  ]
+}

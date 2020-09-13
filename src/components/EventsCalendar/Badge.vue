@@ -1,0 +1,130 @@
+<template>
+  <q-badge
+    class="badge"
+    :class="badgeClasses(event)"
+    :style="badgeStyles(event, timeStartPos, timeDurationHeight)"
+    @click="handleEventClick(event)"
+  >
+    <div class="badge__container">
+      <div class="badge__head">
+        <q-icon v-if="event.icon" :name="event.icon" class="q-mr-xs" />
+        <q-badge :color="badgeColor" text-color="white" :label="event.visitors" />
+      </div>
+      <div class="badge__content">
+        <div class="ellipsis">{{ event.title }}</div>
+        <div class="ellipsis">{{ event.note }}</div>
+      </div>
+    </div>
+  </q-badge>
+</template>
+
+<script>
+import { isCssColor, luminosity } from "src/libs/utils";
+
+export default {
+  name: "EventsCalendarBadge",
+
+  props: {
+    event: {
+      type: Object,
+      required: true,
+    },
+    timeStartPos: {
+      type: Function,
+      default: () => undefined,
+    },
+    timeDurationHeight: {
+      type: Function,
+      default: () => undefined,
+    },
+  },
+
+  computed: {
+    badgeColor() {
+      const num = this.event.visitors
+
+      switch (true) {
+        case num < 6:
+          return "green-8";
+        case num >= 6 && num < 12:
+          return "blue-8";
+        case num >= 12 && num < 18:
+          return "orange-8";
+        case num >= 18 && num < 24:
+          return "deep-orange-8";
+        default:
+          return "blue-grey-8";
+      }
+    },
+  },
+
+  methods: {
+    handleEventClick(ev) {
+      this.$emit("select", ev);
+    },
+
+    badgeClasses (event) {
+      const cssColor = isCssColor(event.bgcolor)
+      return {
+        [`text-white bg-${event.bgcolor}`]: !cssColor,
+        'badge_wide': !event.side || event.side === 'full',
+        'badge_left': event.side === 'left',
+        'badge_right': event.side === 'right',
+      }
+    },
+
+    badgeStyles (event, timeStartPos, timeDurationHeight) {
+      const s = {}
+      if (isCssColor(event.bgcolor)) {
+        s['background-color'] = event.bgcolor
+        s.color = luminosity(event.bgcolor) > 0.5 ? 'black' : 'white'
+      }
+      if (timeStartPos) {
+        s.top = (timeStartPos(event.time) + 1) + 'px'
+      }
+      if (timeDurationHeight) {
+        s.height = (timeDurationHeight(event.duration) - 1) + 'px'
+      }
+      s['align-items'] = 'flex-start'
+      return s
+    },
+  },
+};
+</script>
+
+<style lang="scss" scoped>
+$block: ".badge";
+
+#{$block} {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  font-size: 12px;
+  cursor: pointer;
+
+  .q-past-day & {
+    opacity: .7;
+  }
+
+  &__container {
+    flex: 1;
+    max-width: 100%;
+  }
+
+  &_left {
+    width: calc(50% - 1px);
+  }
+
+  &_right {
+    left: 50%;
+    width: 50%;
+  }
+
+  &__head {
+    display: flex;
+    justify-content: space-between;
+    padding: 1px 0;
+    font-size: 18px
+  }
+}
+</style>

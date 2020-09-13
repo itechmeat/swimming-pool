@@ -1,0 +1,26 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-swimmingpool-dev-102249-authRole",
+      "UnauthRoleArn": "arn:aws:iam::174275336326:role/amplify-swimmingpool-dev-102249-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::174275336326:role/amplify-swimmingpool-dev-102249-authRole",
+      "Region": "eu-west-1",
+      "DeploymentBucketName": "amplify-swimmingpool-dev-102249-deployment",
+      "UnauthRoleName": "amplify-swimmingpool-dev-102249-unauthRole",
+      "StackName": "amplify-swimmingpool-dev-102249",
+      "StackId": "arn:aws:cloudformation:eu-west-1:174275336326:stack/amplify-swimmingpool-dev-102249/70553f80-f336-11ea-92bb-020655186f24",
+      "AmplifyAppId": "d37ucay01qm0w6"
+    },
+    "categories": {
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "d37ucay01qm0w6",
+          "type": "manual"
+        }
+      },
+      "auth": {
+        "swimmingpool0859f226": {}
+      }
+    }
+  }
+}
