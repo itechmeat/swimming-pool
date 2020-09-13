@@ -1,11 +1,11 @@
 <template>
   <q-card class="event-card">
-    <q-img :src="`/images/${value.type}.jpg`" />
+    <q-img :src="`/images/${value.type}.jpg`" class="event-card__cover" />
 
     <q-card-section>
       <q-btn
         fab
-        color="primary"
+        :color="counterColor"
         :label="value.visitors"
         class="event-card__counter"
       />
@@ -62,6 +62,7 @@
 
 <script>
 import { date } from 'quasar'
+import { getCounterColor } from "src/libs/events";
 
 export default {
   name: "EventCard",
@@ -92,7 +93,11 @@ export default {
     isLate() {
       const date = new Date();
       return this.value.endTime < date.getTime();
-    }
+    },
+
+    counterColor() {
+      return getCounterColor(this.value.visitors);
+    },
   },
 
   methods: {
@@ -108,6 +113,10 @@ $block: ".event-card";
 
 #{$block} {
   width: 300px;
+
+  &__cover {
+    height: 140px;
+  }
 
   &__title {
     padding: 8px 10px 0 0;

@@ -68,3 +68,20 @@ export function fillEvent(event) {
 
   return result
 }
+
+export function getCounterColor(num) {
+  switch (true) {
+    case num < 6:
+      return "green-8";
+    case num >= 6 && num < 12:
+      return "blue-8";
+    case num >= 12 && num < 18:
+      return "orange-8";
+    case num >= 18 && num < 24:
+      return "deep-orange-8";
+    case num >= 24:
+      return "negative";
+    default:
+      return "blue-grey-8";
+  }
+}

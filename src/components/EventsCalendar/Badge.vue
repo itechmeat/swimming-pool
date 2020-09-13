@@ -8,7 +8,7 @@
     <div class="badge__container">
       <div class="badge__head">
         <q-icon v-if="event.icon" :name="event.icon" class="q-mr-xs" />
-        <q-badge :color="badgeColor" text-color="white" :label="event.visitors" />
+        <q-badge :color="counterColor" text-color="white" :label="event.visitors" />
       </div>
       <div class="badge__content">
         <div class="ellipsis">{{ event.title }}</div>
@@ -20,6 +20,7 @@
 
 <script>
 import { isCssColor, luminosity } from "src/libs/utils";
+import { getCounterColor } from "src/libs/events";
 
 export default {
   name: "EventsCalendarBadge",
@@ -40,21 +41,8 @@ export default {
   },
 
   computed: {
-    badgeColor() {
-      const num = this.event.visitors
-
-      switch (true) {
-        case num < 6:
-          return "green-8";
-        case num >= 6 && num < 12:
-          return "blue-8";
-        case num >= 12 && num < 18:
-          return "orange-8";
-        case num >= 18 && num < 24:
-          return "deep-orange-8";
-        default:
-          return "blue-grey-8";
-      }
+    counterColor() {
+      return getCounterColor(this.event.visitors);
     },
 
     isLate() {
