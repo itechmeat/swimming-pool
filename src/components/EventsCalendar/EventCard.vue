@@ -1,6 +1,6 @@
 <template>
   <q-card class="event-card">
-    <q-img src="https://cdn.quasar.dev/img/chicken-salad.jpg" />
+    <q-img :src="`/images/${value.type}.jpg`" />
 
     <q-card-section>
       <q-btn
@@ -15,13 +15,13 @@
           {{ value.title }}
         </div>
         <div class="col-auto text-grey text-caption event-card__visitors">
-          Visitors
+          {{ $t('common.visitors') }}
         </div>
       </div>
     </q-card-section>
 
     <q-card-section class="q-pt-none">
-      <div v-if="value.note" class="text-subtitle1">
+      <div class="text-subtitle1">
         <time class="event-card__date">
           <q-icon name="event" />
           {{ eventDate }}
@@ -31,6 +31,9 @@
           {{ eventTime }}
         </time>
       </div>
+      <div v-if="isLate" class="text-subtitle1">
+        <q-chip icon="done_all">{{ $t('common.finished') }}</q-chip>
+      </div>
       <div v-if="value.note" class="text-caption text-grey">
         {{ value.note }}
       </div>
@@ -39,12 +42,17 @@
     <q-separator />
 
     <q-card-actions align="between">
-      <q-btn v-close-popup flat color="warning" label="Close" />
+      <q-btn
+        v-close-popup
+        flat
+        color="warning"
+        :label="$t('common.close')"
+      />
       <q-btn
         flat
         color="primary"
-        label="Reserve"
         icon="event"
+        :label="$t('common.reserve')"
         :disabled="isLate"
         @click="reserve"
       />

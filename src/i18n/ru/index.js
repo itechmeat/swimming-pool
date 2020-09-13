@@ -1,4 +1,10 @@
 export default {
+  common: {
+    close: "Закрыть",
+    finished: "Завершено",
+    reserve: "Записаться",
+    visitors: "Пловцов"
+  },
   events: {
     default: {
       title: "Запланированное мероприятие",

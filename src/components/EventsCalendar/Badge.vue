@@ -56,6 +56,11 @@ export default {
           return "blue-grey-8";
       }
     },
+
+    isLate() {
+      const date = new Date();
+      return this.event.endTime < date.getTime();
+    }
   },
 
   methods: {
@@ -67,26 +72,27 @@ export default {
       const cssColor = isCssColor(event.bgcolor)
       return {
         [`text-white bg-${event.bgcolor}`]: !cssColor,
-        'badge_wide': !event.side || event.side === 'full',
-        'badge_left': event.side === 'left',
-        'badge_right': event.side === 'right',
+        "badge_wide": !event.side || event.side === "full",
+        "badge_left": event.side === "left",
+        "badge_right": event.side === "right",
+        "badge_late": this.isLate,
       }
     },
 
     badgeStyles (event, timeStartPos, timeDurationHeight) {
-      const s = {}
+      const style = {}
       if (isCssColor(event.bgcolor)) {
-        s['background-color'] = event.bgcolor
-        s.color = luminosity(event.bgcolor) > 0.5 ? 'black' : 'white'
+        style["background-color"] = event.bgcolor
+        style.color = luminosity(event.bgcolor) > 0.5 ? "black" : "white"
       }
       if (timeStartPos) {
-        s.top = (timeStartPos(event.time) + 1) + 'px'
+        style.top = (timeStartPos(event.time) + 1) + "px"
       }
       if (timeDurationHeight) {
-        s.height = (timeDurationHeight(event.duration) - 1) + 'px'
+        style.height = (timeDurationHeight(event.duration) - 1) + "px"
       }
-      s['align-items'] = 'flex-start'
-      return s
+      style["align-items"] = "flex-start"
+      return style
     },
   },
 };
@@ -102,7 +108,7 @@ $block: ".badge";
   font-size: 12px;
   cursor: pointer;
 
-  .q-past-day & {
+  &_late {
     opacity: .7;
   }
 
