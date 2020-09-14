@@ -30,3 +30,42 @@ export const listTodos = /* GraphQL */ `
     }
   }
 `;
+export const getEvent = /* GraphQL */ `
+  query GetEvent($id: ID!) {
+    getEvent(id: $id) {
+      id
+      type
+      title
+      description
+      note
+      datestamp
+      duration
+      visitors
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listEvents = /* GraphQL */ `
+  query ListEvents(
+    $filter: ModelEventFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listEvents(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        type
+        title
+        description
+        note
+        datestamp
+        duration
+        visitors
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;

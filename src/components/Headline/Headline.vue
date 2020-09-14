@@ -11,7 +11,7 @@
       />
 
       <q-toolbar-title>
-        Swimming Pool
+        Swimming Pool <small>v.{{ version }}</small>
       </q-toolbar-title>
 
       <q-space />
@@ -24,8 +24,9 @@
 </template>
 
 <script>
-import Language from "components/Headline/Language";
-import User from "components/Headline/User";
+import Language from "src/components/Headline/Language";
+import User from "src/components/Headline/User";
+import INFO from "../../../package.json"
 
 export default {
   name: "Headline",
@@ -34,6 +35,12 @@ export default {
     Language,
     User,
   },
+
+  computed: {
+    version() {
+      return INFO.version;
+    }
+  }
 };
 </script>
 

@@ -13,6 +13,8 @@
       @select="selectEvent"
     />
 
+    <q-inner-loading :showing="isLoading" />
+
     <q-dialog v-model="dialog">
       <event-card :value="visibleEvent" />
     </q-dialog>
@@ -20,7 +22,8 @@
 </template>
 
 <script>
-import EVENTS from "src/assets/events";
+import { mapGetters } from "vuex";
+import { GET_EVENTS, GET_LOADING } from "src/store/modules/events/types";
 import EventsCalendar from "src/components/EventsCalendar/Calendar"
 import EventCard from "src/components/EventsCalendar/EventCard"
 
@@ -34,10 +37,16 @@ export default {
 
   data () {
     return {
-      events: EVENTS,
       dialog: false,
       visibleEvent: null,
     };
+  },
+
+  computed: {
+    ...mapGetters("events", {
+      isLoading: GET_LOADING,
+      events: GET_EVENTS,
+    }),
   },
 
   methods: {
@@ -58,3 +67,11 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+$block: ".calendar";
+
+#{$block} {
+  position: relative;
+}
+</style>

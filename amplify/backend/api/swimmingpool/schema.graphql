@@ -3,3 +3,14 @@ type Todo @model {
   name: String!
   description: String
 }
+
+type Event @model {
+  id: ID!
+  type: String!
+  title: String
+  description: String
+  note: String
+  datestamp: String
+  duration: String
+  visitors: [String]
+}

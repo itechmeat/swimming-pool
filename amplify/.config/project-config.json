@@ -6,9 +6,9 @@
     "framework": "vue",
     "config": {
       "SourceDir": "src",
-      "DistributionDir": "dist/ssr",
-      "BuildCommand": "quasar build -m ssr",
-      "StartCommand": "quasar dev -m ssr"
+      "DistributionDir": "dist/spa",
+      "BuildCommand": "quasar build -m spa",
+      "StartCommand": "quasar dev -m spa"
     }
   },
   "providers": [

@@ -1,6 +1,6 @@
 {
   "name": "swimming-pool",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Web site with schedule for Swimming Pool",
   "productName": "Swimming Pool",
   "author": "Sergey Eroshenkov <itechmeat@gmail.com>",
@@ -21,6 +21,7 @@
     "axios": "^0.20.0",
     "core-js": "^3.6.5",
     "quasar": "^1.14.0",
+    "uuid": "^8.3.0",
     "vue-i18n": "^8.21.1"
   },
   "devDependencies": {

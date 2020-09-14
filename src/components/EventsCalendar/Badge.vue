@@ -8,7 +8,7 @@
     <div class="badge__container">
       <div class="badge__head">
         <q-icon v-if="event.icon" :name="event.icon" class="q-mr-xs" />
-        <q-badge :color="counterColor" text-color="white" :label="event.visitors" />
+        <q-badge :color="counterColor" text-color="white" :label="event.visitors.length" />
       </div>
       <div class="badge__content">
         <div class="ellipsis">{{ event.title }}</div>
@@ -42,7 +42,7 @@ export default {
 
   computed: {
     counterColor() {
-      return getCounterColor(this.event.visitors);
+      return getCounterColor(this.event.visitors.length);
     },
 
     isLate() {

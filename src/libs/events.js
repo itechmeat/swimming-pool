@@ -1,4 +1,5 @@
 import { i18n } from "boot/i18n";
+import { date } from 'quasar'
 
 const TEMPLATES = {
   default: {
@@ -52,8 +53,10 @@ const addContent = (key, item) => {
 export function fillEvent(event) {
   const result = {
     ...event,
+    date: date.formatDate(event.datestamp, "YYYY-MM-DD"),
+    time: date.formatDate(event.datestamp, "HH:mm"),
     duration: event.duration || 60,
-    visitors: event.visitors || 0,
+    visitors: event.visitors || [],
   }
 
   const template = TEMPLATES[event.type]

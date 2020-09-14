@@ -6,7 +6,7 @@
       <q-btn
         fab
         :color="counterColor"
-        :label="value.visitors"
+        :label="value.visitors.length"
         class="event-card__counter"
       />
 
@@ -24,11 +24,11 @@
       <div class="text-subtitle1">
         <time class="event-card__date">
           <q-icon name="event" />
-          {{ eventDate }}
+          {{ value.date }}
         </time>
         <time class="event-card__time">
           <q-icon name="schedule" />
-          {{ eventTime }}
+          {{ value.time }}
         </time>
       </div>
       <div v-if="isLate" class="text-subtitle1">
@@ -75,28 +75,13 @@ export default {
   },
 
   computed: {
-    isoDate() {
-      if (!this.value) {
-        return;
-      }
-      return new Date(this.value.date + ' ' + this.value.time);
-    },
-
-    eventDate() {
-      return date.formatDate(this.isoDate, 'DD.MM.YYYY')
-    },
-
-    eventTime() {
-      return date.formatDate(this.isoDate, 'HH:mm')
-    },
-
     isLate() {
       const date = new Date();
       return this.value.endTime < date.getTime();
     },
 
     counterColor() {
-      return getCounterColor(this.value.visitors);
+      return getCounterColor(this.value.visitors.length);
     },
   },
 

@@ -102,7 +102,7 @@ export default {
           return;
         }
 
-        const startTime = new Date(event.date + ' ' + event.time).getTime();
+        const startTime = new Date(event.datestamp).getTime();
         const endTime = startTime + (event.duration * 60000);
 
         events.push({
