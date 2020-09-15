@@ -1,48 +1,57 @@
 <template>
-  <q-calendar
-    ref="calendar"
-    v-model="selectedDate"
-    view="week"
-    :locale="$i18n.locale"
-    disabled-before="2020-09-10"
-    :weekdays="[1,2,3,4,5,6,0]"
-    enable-outside-days
-    :hour24-format="isHour24Format"
-    :shortIntervalLabel="isShortIntervalLabel"
-    animated
-    :intervalStart="11"
-    :intervalMinutes="30"
-    :intervalHeight="24"
-    :intervalCount="34"
-    transition-prev="slide-right"
-    transition-next="slide-left"
-    bordered
-    @click:time.self="handleTimeClick"
-  >
-    <template #day-body="{ timestamp, timeStartPos, timeDurationHeight }">
-      <template v-for="(event, index) in getEvents(timestamp.date)">
-        <calendar-badge
-          v-if="event.time"
-          :key="index"
-          :event="event"
-          :time-start-pos="timeStartPos"
-          :time-duration-height="timeDurationHeight"
-          @select="selectEvent"
-        />
+  <div class="calendar">
+    <q-calendar
+      ref="calendar"
+      v-model="selectedDate"
+      view="week"
+      :locale="$i18n.locale"
+      disabled-before="2020-09-10"
+      :weekdays="[1,2,3,4,5,6,0]"
+      enable-outside-days
+      :hour24-format="isHour24Format"
+      :shortIntervalLabel="isShortIntervalLabel"
+      animated
+      :intervalStart="11"
+      :intervalMinutes="30"
+      :intervalHeight="24"
+      :intervalCount="34"
+      transition-prev="slide-right"
+      transition-next="slide-left"
+      bordered
+      @click:time.self="handleTimeClick"
+    >
+      <template #day-body="{ timestamp, timeStartPos, timeDurationHeight }">
+        <template v-for="(event, index) in getEvents(timestamp.date)">
+          <calendar-badge
+            v-if="event.time"
+            :key="index"
+            :id="event.id"
+            :side="event.side"
+            :time-start-pos="timeStartPos"
+            :time-duration-height="timeDurationHeight"
+            @select="selectEvent"
+          />
+        </template>
       </template>
-    </template>
-  </q-calendar>
+    </q-calendar>
+
+    <q-dialog v-model="dialog">
+      <event-card :id="visibleEventId" />
+    </q-dialog>
+  </div>
 </template>
 
 <script>
 import { fillEvent } from "src/libs/events";
 import CalendarBadge from "./Badge"
+import EventCard from "src/components/EventsCalendar/EventCard"
 
 export default {
   name: "EventsCalendar",
 
   components: {
     CalendarBadge,
+    EventCard,
   },
 
   props: {
@@ -56,6 +65,8 @@ export default {
     return {
       date: '',
       selectedDate: '',
+      dialog: false,
+      visibleEventId: null,
     };
   },
 
@@ -74,7 +85,7 @@ export default {
     isShortIntervalLabel() {
       const locales = ['en'];
       return locales.includes(this.$i18n.locale);
-    }
+    },
   },
 
   methods: {
@@ -90,8 +101,11 @@ export default {
       this.$refs.calendar.prev()
     },
 
-    selectEvent(ev) {
-      this.$emit("select", ev);
+    selectEvent(eventId) {
+      this.visibleEventId = eventId;
+      this.$nextTick(() => {
+        this.dialog = true;
+      })
     },
 
     getEvents(dt) {

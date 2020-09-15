@@ -1,6 +1,8 @@
 export default {
   common: {
     close: "Закрыть",
+    delete: "Удалить",
+    revoke: "Отменить",
     finished: "Завершено",
     reserve: "Записаться",
     visitors: "Пловцов"

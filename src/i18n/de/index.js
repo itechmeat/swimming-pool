@@ -1,6 +1,8 @@
 export default {
   common: {
     close: "Schließen",
+    delete: "Löschen",
+    revoke: "Widerrufen",
     finished: "Abgeschlossen",
     reserve: "Anmelden",
     visitors: "Besucher"

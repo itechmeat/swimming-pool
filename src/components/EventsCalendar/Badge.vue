@@ -1,34 +1,46 @@
 <template>
   <q-badge
     class="badge"
-    :class="badgeClasses(event)"
-    :style="badgeStyles(event, timeStartPos, timeDurationHeight)"
-    @click="handleEventClick(event)"
+    :class="classes"
+    :style="styles"
+    @click="handleEventClick"
   >
     <div class="badge__container">
       <div class="badge__head">
-        <q-icon v-if="event.icon" :name="event.icon" class="q-mr-xs" />
-        <q-badge :color="counterColor" text-color="white" :label="event.visitors.length" />
+        <q-icon v-if="evt.icon" :name="evt.icon" class="q-mr-xs" />
+        <q-badge :color="counterColor" text-color="white" :label="evt.visitors.length" />
       </div>
+
       <div class="badge__content">
-        <div class="ellipsis">{{ event.title }}</div>
-        <div class="ellipsis">{{ event.note }}</div>
+        <div class="badge__title ellipsis">{{ evt.title }}</div>
+        <div class="badge__note ellipsis">{{ evt.note }}</div>
       </div>
+    </div>
+
+    <div v-if="isIncluded" class="badge__status">
+      <q-icon name="done_all" />
     </div>
   </q-badge>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+import { GET_USER } from "src/store/modules/user/types";
+import { GET_EVENT_BY_ID } from "src/store/modules/events/types";
 import { isCssColor, luminosity } from "src/libs/utils";
-import { getCounterColor } from "src/libs/events";
+import {fillEvent, getCounterColor} from "src/libs/events";
 
 export default {
   name: "EventsCalendarBadge",
 
   props: {
-    event: {
-      type: Object,
+    id: {
+      type: String,
       required: true,
+    },
+    side: {
+      type: String,
+      default: () => "full",
     },
     timeStartPos: {
       type: Function,
@@ -41,46 +53,71 @@ export default {
   },
 
   computed: {
+    ...mapGetters("user", {
+      user: GET_USER,
+    }),
+
+    ...mapGetters("events", {
+      getEventById: GET_EVENT_BY_ID,
+    }),
+
+    evt() {
+      const event = this.getEventById(this.id);
+      if (!event) {
+        return;
+      }
+      return fillEvent(event);
+    },
+
     counterColor() {
-      return getCounterColor(this.event.visitors.length);
+      return getCounterColor(this.evt.visitors.length);
     },
 
     isLate() {
       const date = new Date();
-      return this.event.endTime < date.getTime();
-    }
-  },
-
-  methods: {
-    handleEventClick(ev) {
-      this.$emit("select", ev);
+      return this.evt.endTime < date.getTime();
     },
 
-    badgeClasses (event) {
-      const cssColor = isCssColor(event.bgcolor)
+    isIncluded() {
+      if (!this.user) {
+        return;
+      }
+      return this.evt.visitors.includes(this.user.username)
+    },
+
+    classes() {
+      const cssColor = isCssColor(this.evt.bgcolor)
       return {
-        [`text-white bg-${event.bgcolor}`]: !cssColor,
-        "badge_wide": !event.side || event.side === "full",
-        "badge_left": event.side === "left",
-        "badge_right": event.side === "right",
+        [`text-white bg-${this.evt.bgcolor}`]: !cssColor,
+        "badge_wide": !this.side || this.side === "full",
+        "badge_left": this.side === "left",
+        "badge_right": this.side === "right",
         "badge_late": this.isLate,
+        "badge_short": this.evt.duration <= 60,
+        "badge_my": this.isIncluded,
       }
     },
 
-    badgeStyles (event, timeStartPos, timeDurationHeight) {
+    styles() {
       const style = {}
-      if (isCssColor(event.bgcolor)) {
-        style["background-color"] = event.bgcolor
-        style.color = luminosity(event.bgcolor) > 0.5 ? "black" : "white"
+      if (isCssColor(this.evt.bgcolor)) {
+        style["background-color"] = this.evt.bgcolor;
+        style.color = luminosity(this.evt.bgcolor) > 0.5 ? "black" : "white";
       }
-      if (timeStartPos) {
-        style.top = (timeStartPos(event.time) + 1) + "px"
+      if (this.timeStartPos) {
+        style.top = (this.timeStartPos(this.evt.time) + 1) + "px"
       }
-      if (timeDurationHeight) {
-        style.height = (timeDurationHeight(event.duration) - 1) + "px"
+      if (this.timeDurationHeight) {
+        style.height = (this.timeDurationHeight(this.evt.duration) - 1) + "px"
       }
       style["align-items"] = "flex-start"
       return style
+    },
+  },
+
+  methods: {
+    handleEventClick() {
+      this.$emit("select", this.evt.id);
     },
   },
 };
@@ -100,11 +137,6 @@ $block: ".badge";
     opacity: .7;
   }
 
-  &__container {
-    flex: 1;
-    max-width: 100%;
-  }
-
   &_left {
     width: calc(50% - 1px);
   }
@@ -114,11 +146,42 @@ $block: ".badge";
     width: 50%;
   }
 
+  &__container {
+    flex: 1;
+    position: relative;
+    max-width: 100%;
+  }
+
   &__head {
     display: flex;
     justify-content: space-between;
     padding: 1px 0;
-    font-size: 18px
+    font-size: 18px;
+  }
+
+  &__content {
+    padding: 6px 0;
+  }
+
+  &__title {
+    #{$block}_short#{$block}_my & {
+      margin-right: 18px;
+    }
+  }
+
+  &__note {
+    #{$block}_short & {
+      display: none;
+    }
+  }
+
+  &__status {
+    position: absolute;
+    right: 6px;
+    bottom: 4px;
+    font-size: 16px;
+    line-height: 1;
+    text-align: right;
   }
 }
 </style>

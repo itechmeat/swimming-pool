@@ -1,5 +1,5 @@
 <template>
-  <div class="calendar">
+  <div class="calendar-page">
     <div class="row justify-center items-center">
       <q-btn flat label="Prev" @click="calendarPrev" />
       <q-separator vertical />
@@ -7,17 +7,9 @@
     </div>
     <q-separator />
 
-    <events-calendar
-      ref="calendar"
-      :events="events"
-      @select="selectEvent"
-    />
+    <events-calendar ref="calendar" :events="events" />
 
     <q-inner-loading :showing="isLoading" />
-
-    <q-dialog v-model="dialog">
-      <event-card :value="visibleEvent" />
-    </q-dialog>
   </div>
 </template>
 
@@ -25,20 +17,18 @@
 import { mapGetters } from "vuex";
 import { GET_EVENTS, GET_LOADING } from "src/store/modules/events/types";
 import EventsCalendar from "src/components/EventsCalendar/Calendar"
-import EventCard from "src/components/EventsCalendar/EventCard"
 
 export default {
   name: "CalendarPage",
 
   components: {
     EventsCalendar,
-    EventCard,
   },
 
   data () {
     return {
       dialog: false,
-      visibleEvent: null,
+      visibleEventId: null,
     };
   },
 
@@ -57,19 +47,12 @@ export default {
     calendarPrev () {
       this.$refs.calendar.calendarPrev()
     },
-
-    selectEvent(ev) {
-      this.visibleEvent = ev;
-      this.$nextTick(() => {
-        this.dialog = true;
-      })
-    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-$block: ".calendar";
+$block: ".calendar-page";
 
 #{$block} {
   position: relative;

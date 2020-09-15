@@ -1,18 +1,18 @@
 <template>
-  <q-card class="event-card">
-    <q-img :src="`/images/${value.type}.jpg`" class="event-card__cover" />
+  <q-card v-if="evt" class="event-card">
+    <q-img :src="`/images/${evt.type}.jpg`" class="event-card__cover" />
 
     <q-card-section>
       <q-btn
         fab
         :color="counterColor"
-        :label="value.visitors.length"
+        :label="evt.visitors.length"
         class="event-card__counter"
       />
 
       <div class="row no-wrap items-center">
         <div class="col text-h6 event-card__title">
-          {{ value.title }}
+          {{ evt.title }}
         </div>
         <div class="col-auto text-grey text-caption event-card__visitors">
           {{ $t('common.visitors') }}
@@ -24,18 +24,18 @@
       <div class="text-subtitle1">
         <time class="event-card__date">
           <q-icon name="event" />
-          {{ value.date }}
+          {{ evt.date }}
         </time>
         <time class="event-card__time">
           <q-icon name="schedule" />
-          {{ value.time }}
+          {{ evt.time }}
         </time>
       </div>
       <div v-if="isLate" class="text-subtitle1">
         <q-chip icon="done_all">{{ $t('common.finished') }}</q-chip>
       </div>
-      <div v-if="value.note" class="text-caption text-grey">
-        {{ value.note }}
+      <div v-if="evt.note" class="text-caption text-grey">
+        {{ evt.note }}
       </div>
     </q-card-section>
 
@@ -48,11 +48,22 @@
         color="warning"
         :label="$t('common.close')"
       />
+
+      <q-btn
+        flat
+        round
+        color="negative"
+        icon="delete"
+        @click="remove"
+      />
+
+      <q-space />
+
       <q-btn
         flat
         color="primary"
         icon="event"
-        :label="$t('common.reserve')"
+        :label="reserveButtonText"
         :disabled="isLate"
         @click="reserve"
       />
@@ -61,33 +72,92 @@
 </template>
 
 <script>
-import { date } from 'quasar'
+import { mapGetters, mapMutations, mapActions } from "vuex";
+import { GET_USER, SET_AUTH_FORM_STATE } from "src/store/modules/user/types";
+import { GET_EVENT_BY_ID } from "src/store/modules/events/types";
 import { getCounterColor } from "src/libs/events";
+import { fillEvent } from "src/libs/events";
 
 export default {
   name: "EventCard",
 
   props: {
-    value: {
-      type: Object,
+    id: {
+      type: String,
       required: true,
     },
   },
 
   computed: {
+    ...mapGetters("user", {
+      user: GET_USER,
+    }),
+
+    ...mapGetters("events", {
+      getEventById: GET_EVENT_BY_ID,
+    }),
+
+    evt() {
+      const event = this.getEventById(this.id);
+      if (!event) {
+        return;
+      }
+      return fillEvent(event);
+    },
+
     isLate() {
       const date = new Date();
-      return this.value.endTime < date.getTime();
+      return this.evt.endTime < date.getTime();
+    },
+
+    myIndex() {
+      if (!this.user) {
+        return;
+      }
+      return this.evt.visitors.findIndex((evt) => evt === this.user.username)
     },
 
     counterColor() {
-      return getCounterColor(this.value.visitors.length);
+      return getCounterColor(this.evt.visitors.length);
+    },
+
+    reserveButtonText() {
+      if (this.myIndex === -1 || !this.user) {
+        return this.$t('common.reserve')
+      }
+      return this.$t('common.revoke')
     },
   },
 
   methods: {
+    ...mapActions("events", ["updateEvent", "deleteEvent"]),
+
+    ...mapMutations("user", {
+      setAuthFormState: SET_AUTH_FORM_STATE,
+    }),
+
     reserve() {
-      console.log('###')
+      if (!this.user) {
+        this.setAuthFormState(true);
+        return;
+      }
+
+      const visitors = [...this.evt.visitors];
+
+      if (this.myIndex !== -1) {
+        visitors.splice(this.myIndex, 1)
+      } else {
+        visitors.push(this.user.username)
+      }
+
+      this.updateEvent({
+        id: this.evt.id,
+        visitors,
+      });
+    },
+
+    remove() {
+      this.deleteEvent({ id: this.evt.id });
     }
   },
 };

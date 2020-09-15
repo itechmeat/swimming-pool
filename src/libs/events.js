@@ -51,11 +51,17 @@ const addContent = (key, item) => {
 }
 
 export function fillEvent(event) {
+  const duration = event.duration || 60
+  const startTime = new Date(event.datestamp).getTime();
+  const endTime = startTime + (event.duration * 60000);
+
   const result = {
     ...event,
+    startTime,
+    endTime,
+    duration,
     date: date.formatDate(event.datestamp, "YYYY-MM-DD"),
     time: date.formatDate(event.datestamp, "HH:mm"),
-    duration: event.duration || 60,
     visitors: event.visitors || [],
   }
 
