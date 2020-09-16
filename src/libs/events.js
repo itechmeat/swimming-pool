@@ -44,6 +44,8 @@ const TEMPLATES = {
   },
 };
 
+const ALLOWED_KEYS = ["id", "type", "title", "description", "note", "datestamp", "duration", "visitors"]
+
 const addContent = (key, item) => {
   if (!item[key]) {
     item[key] = i18n.t(`events.${item.type}.${key}`)
@@ -93,4 +95,32 @@ export function getCounterColor(num) {
     default:
       return "blue-grey-8";
   }
+}
+
+export function getEventTypes() {
+  return Object.keys(TEMPLATES);
+}
+
+export function resolveEvent(event) {
+  const result = {};
+
+  ALLOWED_KEYS.forEach((key) => {
+    let value = event[key];
+
+    if (!value) {
+      return;
+    }
+
+    if (value.length === 0) {
+      if (Array.isArray(value)) {
+        value = []
+      } else {
+        value = null
+      }
+    }
+
+    result[key] = value;
+  })
+
+  return result;
 }

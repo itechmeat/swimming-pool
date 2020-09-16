@@ -38,6 +38,7 @@ export const onCreateEvent = /* GraphQL */ `
   subscription OnCreateEvent {
     onCreateEvent {
       id
+      author
       type
       title
       description
@@ -54,6 +55,7 @@ export const onUpdateEvent = /* GraphQL */ `
   subscription OnUpdateEvent {
     onUpdateEvent {
       id
+      author
       type
       title
       description
@@ -70,6 +72,7 @@ export const onDeleteEvent = /* GraphQL */ `
   subscription OnDeleteEvent {
     onDeleteEvent {
       id
+      author
       type
       title
       description

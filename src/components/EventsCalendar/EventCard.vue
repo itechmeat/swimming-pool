@@ -2,6 +2,24 @@
   <q-card v-if="evt" class="event-card">
     <q-img :src="`/images/${evt.type}.jpg`" class="event-card__cover" />
 
+    <div v-if="canEdit" class="event-card__changes">
+      <q-btn
+        round
+        size="sm"
+        color="primary"
+        icon="edit"
+        @click="edit"
+      />
+
+      <q-btn
+        round
+        size="sm"
+        color="negative"
+        icon="delete"
+        @click="remove"
+      />
+    </div>
+
     <q-card-section>
       <q-btn
         v-if="!isSanitary"
@@ -25,7 +43,6 @@
     </q-card-section>
 
     <q-card-section class="q-pt-none">
-      {{ isTooFar }} !!!
       <div class="text-subtitle1">
         <time class="event-card__date">
           <q-icon name="event" />
@@ -63,14 +80,6 @@
         :label="$t('common.close')"
       />
 
-      <q-btn
-        flat
-        round
-        color="negative"
-        icon="delete"
-        @click="remove"
-      />
-
       <q-space />
 
       <q-btn
@@ -88,7 +97,7 @@
 
 <script>
 import { mapGetters, mapMutations, mapActions } from "vuex";
-import { GET_USER, SET_AUTH_FORM_STATE } from "src/store/modules/user/types";
+import { GET_USER, SET_AUTH_FORM_STATE, IS_ADMIN } from "src/store/modules/user/types";
 import { GET_EVENT_BY_ID, IS_DAY_RESERVED } from "src/store/modules/events/types";
 import { getCounterColor } from "src/libs/events";
 import { fillEvent } from "src/libs/events";
@@ -107,6 +116,7 @@ export default {
   computed: {
     ...mapGetters("user", {
       user: GET_USER,
+      isAdmin: IS_ADMIN,
     }),
 
     ...mapGetters("events", {
@@ -120,6 +130,13 @@ export default {
         return;
       }
       return fillEvent(event);
+    },
+
+    canEdit() {
+      if (!this.user) {
+        return;
+      }
+      return this.user.username === this.evt.author || this.isAdmin;
     },
 
     endTime() {
@@ -201,8 +218,18 @@ export default {
       });
     },
 
-    remove() {
-      this.deleteEvent({ id: this.evt.id });
+    async edit() {
+      this.$emit('edit', this.evt)
+    },
+
+    async remove() {
+      const response = await this.deleteEvent({ id: this.evt.id });
+
+      if (!response) {
+        return;
+      }
+
+      this.$emit('close');
     }
   },
 };
@@ -251,6 +278,14 @@ $block: ".event-card";
 
   &__time {
     margin-left: 16px;
+  }
+
+  &__changes {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: flex;
+    gap: 4px;
   }
 }
 </style>

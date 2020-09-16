@@ -1,5 +1,7 @@
 export default {
   common: {
+    create: "Erstellen",
+    update: "Aktualisieren",
     close: "Schließen",
     delete: "Löschen",
     revoke: "Widerrufen",
@@ -48,6 +50,15 @@ export default {
       title: "Hygienetag",
       details: "Die Einrichtung funktioniert nicht",
     },
+  },
+  labels: {
+    not_necessary: "Nicht nötig",
+    event_type: "Art des Ereignisses",
+    title: "Titel",
+    description: "Beschreibung",
+    note: "Hinweis",
+    duration: "Dauer",
+    add_event: "Ereignis hinzufügen",
   },
   messages: {
     is_reserved_day: "Sie haben sich an diesem Tag bereits für die Veranstaltung angemeldet",

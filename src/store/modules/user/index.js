@@ -17,6 +17,13 @@ const getters = {
   [TYPES.GET_AUTH_FORM_STATE]: (state) => state.isAuthFormActive,
   [TYPES.GET_USER]: (state) => state.user,
   [TYPES.GET_AUTH]: (state) => state.authState,
+
+  [TYPES.IS_ADMIN]: (state) => {
+    if (!state.user || !state.user.signInUserSession) {
+      return;
+    }
+    return state.user.signInUserSession.accessToken.payload["cognito:groups"].includes("admins")
+  },
 };
 
 const mutations = {

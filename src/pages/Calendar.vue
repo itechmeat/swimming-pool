@@ -1,9 +1,29 @@
 <template>
   <div class="calendar-page">
     <div class="row justify-center items-center">
-      <q-btn flat label="Prev" @click="calendarPrev" />
+      <q-btn
+        flat
+        icon="arrow_back"
+        @click="calendarPrev"
+      />
+
       <q-separator vertical />
-      <q-btn flat label="Next" @click="calendarNext" />
+
+      <q-btn
+        v-if="user"
+        flat
+        :label="$t('labels.add_event')"
+        color="teal"
+        @click="addEvent"
+      />
+
+      <q-separator v-if="user" vertical />
+
+      <q-btn
+        flat
+        icon="arrow_forward"
+        @click="calendarNext"
+      />
     </div>
     <q-separator />
 
@@ -15,8 +35,9 @@
 
 <script>
 import { mapGetters } from "vuex";
+import { GET_USER } from "src/store/modules/user/types";
 import { GET_EVENTS, GET_LOADING } from "src/store/modules/events/types";
-import EventsCalendar from "src/components/EventsCalendar/Calendar"
+import EventsCalendar from "src/components/EventsCalendar/Calendar";
 
 export default {
   name: "CalendarPage",
@@ -33,6 +54,10 @@ export default {
   },
 
   computed: {
+    ...mapGetters("user", {
+      user: GET_USER,
+    }),
+
     ...mapGetters("events", {
       isLoading: GET_LOADING,
       events: GET_EVENTS,
@@ -41,11 +66,15 @@ export default {
 
   methods: {
     calendarNext () {
-      this.$refs.calendar.calendarNext()
+      this.$refs.calendar.calendarNext();
     },
 
     calendarPrev () {
-      this.$refs.calendar.calendarPrev()
+      this.$refs.calendar.calendarPrev();
+    },
+
+    addEvent () {
+      this.$refs.calendar.showEventsForm();
     },
   },
 };

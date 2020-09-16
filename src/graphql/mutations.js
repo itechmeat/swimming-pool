@@ -50,6 +50,7 @@ export const createEvent = /* GraphQL */ `
   ) {
     createEvent(input: $input, condition: $condition) {
       id
+      author
       type
       title
       description
@@ -69,6 +70,7 @@ export const updateEvent = /* GraphQL */ `
   ) {
     updateEvent(input: $input, condition: $condition) {
       id
+      author
       type
       title
       description
@@ -88,6 +90,7 @@ export const deleteEvent = /* GraphQL */ `
   ) {
     deleteEvent(input: $input, condition: $condition) {
       id
+      author
       type
       title
       description

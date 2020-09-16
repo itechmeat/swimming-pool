@@ -6,11 +6,12 @@ type Todo @model {
 
 type Event @model {
   id: ID!
+  author: String
   type: String!
   title: String
   description: String
   note: String
   datestamp: String
-  duration: String
+  duration: Int
   visitors: [String]
 }

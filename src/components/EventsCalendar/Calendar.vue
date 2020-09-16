@@ -35,16 +35,33 @@
       </template>
     </q-calendar>
 
-    <q-dialog v-model="dialog">
-      <event-card :id="visibleEventId" />
+    <q-dialog v-model="eventDialog">
+      <event-card :id="visibleEventId" @close="eventDialog = false" @edit="showEventsForm" />
+    </q-dialog>
+
+    <q-dialog v-model="formDialog">
+      <event-form v-model="editedEvent" @submit="submitEvent" />
     </q-dialog>
   </div>
 </template>
 
 <script>
+import { mapActions } from "vuex";
 import { fillEvent } from "src/libs/events";
 import CalendarBadge from "./Badge"
 import EventCard from "src/components/EventsCalendar/EventCard"
+import EventForm from "src/components/EventsCalendar/EventForm"
+import { date } from "quasar";
+
+const EMPTY_EVENT = {
+  type: "swimming",
+  title: null,
+  description: null,
+  note: null,
+  datestamp: null,
+  duration: 60,
+  visitors: [],
+}
 
 export default {
   name: "EventsCalendar",
@@ -52,6 +69,7 @@ export default {
   components: {
     CalendarBadge,
     EventCard,
+    EventForm,
   },
 
   props: {
@@ -65,8 +83,10 @@ export default {
     return {
       date: '',
       selectedDate: '',
-      dialog: false,
+      eventDialog: false,
       visibleEventId: null,
+      formDialog: false,
+      editedEvent: null,
     };
   },
 
@@ -89,22 +109,56 @@ export default {
   },
 
   methods: {
+    ...mapActions("events", ["createEvent", "updateEvent"]),
+
     handleTimeClick(info) {
-      console.log('handleTimeClick', info)
+      console.log('handleTimeClick', info);
     },
 
-    calendarNext () {
-      this.$refs.calendar.next()
+    calendarNext() {
+      this.$refs.calendar.next();
     },
 
-    calendarPrev () {
-      this.$refs.calendar.prev()
+    calendarPrev() {
+      this.$refs.calendar.prev();
+    },
+
+    showEventsForm(evt) {
+      if (!evt) {
+        this.editedEvent = {
+          ...EMPTY_EVENT,
+          datestamp: date.formatDate(new Date(), 'YYYY-MM-DD HH:mm'),
+        };
+      } else {
+        this.editedEvent = { ...evt };
+      }
+      this.$nextTick(() => {
+        this.formDialog = true;
+      })
+    },
+
+    async submitEvent() {
+      let response;
+
+      if (!this.editedEvent.id) {
+        response = await this.createEvent(this.editedEvent)
+      } else {
+        response = await this.updateEvent(this.editedEvent)
+      }
+
+      if (!response) {
+        return;
+      }
+
+      this.editedEvent = null;
+      this.formDialog = false;
+      this.eventDialog = false;
     },
 
     selectEvent(eventId) {
       this.visibleEventId = eventId;
       this.$nextTick(() => {
-        this.dialog = true;
+        this.eventDialog = true;
       })
     },
 

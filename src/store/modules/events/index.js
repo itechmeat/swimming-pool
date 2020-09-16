@@ -5,6 +5,7 @@ import { listEvents } from "src/graphql/queries";
 import { onCreateEvent, onUpdateEvent, onDeleteEvent } from "src/graphql/subscriptions";
 Amplify.configure(awsConfig);
 import { date } from "quasar";
+import { resolveEvent } from "src/libs/events"
 
 import * as TYPES from "./types";
 
@@ -22,11 +23,17 @@ const getters = {
   [TYPES.GET_EVENT_BY_ID]: (state) => (id) => state.events.find((evt) => evt.id === id),
 
   [TYPES.IS_EVENT_RESERVED]: (state, getters, rootState) => (id) => {
+    if (!rootState.user.user) {
+      return;
+    }
     const event = state.events.find((evt) => evt.id === id);
     return event.visitors.includes(rootState.user.user.username);
   },
 
   [TYPES.IS_DAY_RESERVED]: (state, getters, rootState) => (targetDate) => state.events.some((evt) => {
+    if (!rootState.user.user) {
+      return;
+    }
     return evtDate(evt.datestamp) === targetDate && evt.visitors.includes(rootState.user.user.username);
   }),
 };
@@ -64,22 +71,32 @@ const actions = {
         commit("SET_EVENTS", evt.data.listEvents.items);
         commit("SET_LOADING", false);
       });
+      return true;
     } catch (err) {
       commit("SET_LOADING", false);
+      return false;
     }
   },
 
-  async createEvent({ commit, dispatch }, event) {
+  async createEvent({ commit, dispatch, rootState }, event) {
     commit("SET_LOADING", true);
+
+    const usersEvent = {
+      ...resolveEvent(event),
+      author: rootState.user.user.username,
+    };
+
     try {
       await API.graphql(
-        graphqlOperation(createEvent, { input: event })
+        graphqlOperation(createEvent, { input: usersEvent })
       );
 
       dispatch("fetchEvents");
       commit("SET_LOADING", false);
+      return true;
     } catch (e) {
       commit("SET_LOADING", false);
+      return false;
     }
   },
 
@@ -87,13 +104,15 @@ const actions = {
     commit("SET_LOADING", true);
     try {
       await API.graphql(
-        graphqlOperation(updateEvent, { input: event })
+        graphqlOperation(updateEvent, { input: resolveEvent(event) })
       );
 
       commit("SET_LOADING", false);
+      return true;
     } catch (e) {
       console.error(e);
       commit("SET_LOADING", false);
+      return false;
     }
   },
 
@@ -105,9 +124,11 @@ const actions = {
       );
 
       commit("SET_LOADING", false);
+      return true;
     } catch (e) {
       console.error(e);
       commit("SET_LOADING", false);
+      return false;
     }
   },
 

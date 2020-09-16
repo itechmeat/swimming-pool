@@ -1,5 +1,7 @@
 export default {
   common: {
+    create: "Создать",
+    update: "Обновить",
     close: "Закрыть",
     delete: "Удалить",
     revoke: "Отменить",
@@ -48,6 +50,15 @@ export default {
       title: "Санитарный день",
       details: "Заведение не работает",
     },
+  },
+  labels: {
+    not_necessary: "Не обязательно",
+    event_type: "Тип события",
+    title: "Название",
+    description: "Описание",
+    note: "Дополнительно",
+    duration: "Длительность",
+    add_event: "Добавить событие",
   },
   messages: {
     is_reserved_day: "Вы уже регистрировались на мероприятие в этот день",

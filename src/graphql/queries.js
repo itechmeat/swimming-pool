@@ -34,6 +34,7 @@ export const getEvent = /* GraphQL */ `
   query GetEvent($id: ID!) {
     getEvent(id: $id) {
       id
+      author
       type
       title
       description
@@ -55,6 +56,7 @@ export const listEvents = /* GraphQL */ `
     listEvents(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
+        author
         type
         title
         description
