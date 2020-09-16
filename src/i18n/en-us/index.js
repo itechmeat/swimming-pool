@@ -5,7 +5,7 @@ export default {
     revoke: "Revoke",
     finished: "Finished",
     reserve: "Reserve",
-    visitors: "visitors"
+    visitors: "visitors",
   },
   events: {
     default: {
@@ -48,5 +48,9 @@ export default {
       title: "Sanitary day",
       details: "The establishment does not work",
     },
+  },
+  messages: {
+    is_reserved_day: "You have already registered for the event that day",
+    is_too_far: "You cannot register for the event more than one month",
   },
 };

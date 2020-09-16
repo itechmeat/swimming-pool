@@ -5,7 +5,7 @@ export default {
     revoke: "Отменить",
     finished: "Завершено",
     reserve: "Записаться",
-    visitors: "Пловцов"
+    visitors: "Пловцов",
   },
   events: {
     default: {
@@ -48,5 +48,9 @@ export default {
       title: "Санитарный день",
       details: "Заведение не работает",
     },
+  },
+  messages: {
+    is_reserved_day: "Вы уже регистрировались на мероприятие в этот день",
+    is_too_far: "Вы не можете зарегистрироваться на мероприятие далее одного месяца",
   },
 };

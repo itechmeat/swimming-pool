@@ -5,7 +5,7 @@ export default {
     revoke: "Widerrufen",
     finished: "Abgeschlossen",
     reserve: "Anmelden",
-    visitors: "Besucher"
+    visitors: "Besucher",
   },
   events: {
     default: {
@@ -48,5 +48,9 @@ export default {
       title: "Hygienetag",
       details: "Die Einrichtung funktioniert nicht",
     },
+  },
+  messages: {
+    is_reserved_day: "Sie haben sich an diesem Tag bereits für die Veranstaltung angemeldet",
+    is_too_far: "Sie können sich nicht länger als einen Monat für die Veranstaltung anmelden",
   },
 };

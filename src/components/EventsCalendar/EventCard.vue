@@ -4,6 +4,7 @@
 
     <q-card-section>
       <q-btn
+        v-if="!isSanitary"
         fab
         :color="counterColor"
         :label="evt.visitors.length"
@@ -14,13 +15,17 @@
         <div class="col text-h6 event-card__title">
           {{ evt.title }}
         </div>
-        <div class="col-auto text-grey text-caption event-card__visitors">
+        <div
+          v-if="!isSanitary"
+          class="col-auto text-grey text-caption event-card__visitors"
+        >
           {{ $t('common.visitors') }}
         </div>
       </div>
     </q-card-section>
 
     <q-card-section class="q-pt-none">
+      {{ isTooFar }} !!!
       <div class="text-subtitle1">
         <time class="event-card__date">
           <q-icon name="event" />
@@ -28,11 +33,20 @@
         </time>
         <time class="event-card__time">
           <q-icon name="schedule" />
-          {{ evt.time }}
+          {{ evt.time }} - {{ endTime }}
         </time>
       </div>
       <div v-if="isLate" class="text-subtitle1">
         <q-chip icon="done_all">{{ $t('common.finished') }}</q-chip>
+      </div>
+      <div
+        v-if="isReservedDay && !canChangeReserve && !isLate"
+        class="text-warning"
+      >
+        {{ $t('messages.is_reserved_day') }}
+      </div>
+      <div v-if="isTooFar" class="text-warning">
+        {{ $t('messages.is_too_far') }}
       </div>
       <div v-if="evt.note" class="text-caption text-grey">
         {{ evt.note }}
@@ -60,11 +74,12 @@
       <q-space />
 
       <q-btn
+        v-if="!isSanitary"
         flat
         color="primary"
         icon="event"
         :label="reserveButtonText"
-        :disabled="isLate"
+        :disabled="!canChangeReserve"
         @click="reserve"
       />
     </q-card-actions>
@@ -74,9 +89,10 @@
 <script>
 import { mapGetters, mapMutations, mapActions } from "vuex";
 import { GET_USER, SET_AUTH_FORM_STATE } from "src/store/modules/user/types";
-import { GET_EVENT_BY_ID } from "src/store/modules/events/types";
+import { GET_EVENT_BY_ID, IS_DAY_RESERVED } from "src/store/modules/events/types";
 import { getCounterColor } from "src/libs/events";
 import { fillEvent } from "src/libs/events";
+import { date } from "quasar";
 
 export default {
   name: "EventCard",
@@ -95,6 +111,7 @@ export default {
 
     ...mapGetters("events", {
       getEventById: GET_EVENT_BY_ID,
+      isDayReserved: IS_DAY_RESERVED,
     }),
 
     evt() {
@@ -105,16 +122,44 @@ export default {
       return fillEvent(event);
     },
 
-    isLate() {
-      const date = new Date();
-      return this.evt.endTime < date.getTime();
+    endTime() {
+      return date.formatDate(this.evt.endTime, "HH:mm");
     },
 
-    myIndex() {
+    isLate() {
+      const date = new Date();
+      return (this.evt.endTime < date.getTime());
+    },
+
+    isTooFar() {
+      const farDate = date.addToDate(new Date(), { month: 1 }).getTime();
+      return farDate < this.evt.startTime;
+    },
+
+    isSanitary() {
+      return this.evt.type === "sanitary";
+    },
+
+    isEventReserved() {
       if (!this.user) {
         return;
       }
+      return this.evt.visitors.includes(this.user.username);
+    },
+
+    isReservedDay() {
+      return this.isDayReserved(this.evt.date);
+    },
+
+    myIndex() {
+      if (!this.isEventReserved) {
+        return;
+      }
       return this.evt.visitors.findIndex((evt) => evt === this.user.username)
+    },
+
+    canChangeReserve() {
+      return !this.isLate && !this.isTooFar && (!this.isReservedDay || this.isEventReserved);
     },
 
     counterColor() {
@@ -122,7 +167,7 @@ export default {
     },
 
     reserveButtonText() {
-      if (this.myIndex === -1 || !this.user) {
+      if (!this.isEventReserved || !this.user) {
         return this.$t('common.reserve')
       }
       return this.$t('common.revoke')
@@ -144,7 +189,7 @@ export default {
 
       const visitors = [...this.evt.visitors];
 
-      if (this.myIndex !== -1) {
+      if (this.isEventReserved) {
         visitors.splice(this.myIndex, 1)
       } else {
         visitors.push(this.user.username)

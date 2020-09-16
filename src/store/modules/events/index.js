@@ -4,10 +4,12 @@ import { createEvent, updateEvent, deleteEvent } from "src/graphql/mutations";
 import { listEvents } from "src/graphql/queries";
 import { onCreateEvent, onUpdateEvent, onDeleteEvent } from "src/graphql/subscriptions";
 Amplify.configure(awsConfig);
+import { date } from "quasar";
 
 import * as TYPES from "./types";
 
 const namespaced = true;
+const evtDate = (stamp) => date.formatDate(stamp, "YYYY-MM-DD");
 
 const state = () => ({
   isLoading: false,
@@ -18,6 +20,15 @@ const getters = {
   [TYPES.GET_LOADING]: (state) => state.isLoading,
   [TYPES.GET_EVENTS]: (state) => state.events,
   [TYPES.GET_EVENT_BY_ID]: (state) => (id) => state.events.find((evt) => evt.id === id),
+
+  [TYPES.IS_EVENT_RESERVED]: (state, getters, rootState) => (id) => {
+    const event = state.events.find((evt) => evt.id === id);
+    return event.visitors.includes(rootState.user.user.username);
+  },
+
+  [TYPES.IS_DAY_RESERVED]: (state, getters, rootState) => (targetDate) => state.events.some((evt) => {
+    return evtDate(evt.datestamp) === targetDate && evt.visitors.includes(rootState.user.user.username);
+  }),
 };
 
 const mutations = {

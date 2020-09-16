@@ -8,7 +8,12 @@
     <div class="badge__container">
       <div class="badge__head">
         <q-icon v-if="evt.icon" :name="evt.icon" class="q-mr-xs" />
-        <q-badge :color="counterColor" text-color="white" :label="evt.visitors.length" />
+        <q-badge
+          v-if="!isSanitary"
+          :color="counterColor"
+          :label="evt.visitors.length"
+          text-color="white"
+        />
       </div>
 
       <div class="badge__content">
@@ -17,7 +22,7 @@
       </div>
     </div>
 
-    <div v-if="isIncluded" class="badge__status">
+    <div v-if="isEventReserved" class="badge__status">
       <q-icon name="done_all" />
     </div>
   </q-badge>
@@ -73,12 +78,16 @@ export default {
       return getCounterColor(this.evt.visitors.length);
     },
 
+    isSanitary() {
+      return this.evt.type === "sanitary";
+    },
+
     isLate() {
       const date = new Date();
       return this.evt.endTime < date.getTime();
     },
 
-    isIncluded() {
+    isEventReserved() {
       if (!this.user) {
         return;
       }
@@ -94,7 +103,7 @@ export default {
         "badge_right": this.side === "right",
         "badge_late": this.isLate,
         "badge_short": this.evt.duration <= 60,
-        "badge_my": this.isIncluded,
+        "badge_my": this.isEventReserved,
       }
     },
 

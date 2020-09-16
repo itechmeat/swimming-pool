@@ -6,3 +6,6 @@ export const GET_EVENT_BY_ID = "GET_EVENT_BY_ID";
 export const ADD_EVENT = "ADD_EVENT";
 export const UPDATE_EVENT = "UPDATE_EVENT";
 export const DELETE_EVENT = "DELETE_EVENT";
+
+export const IS_EVENT_RESERVED = "IS_EVENT_RESERVED";
+export const IS_DAY_RESERVED = "IS_DAY_RESERVED";
