@@ -55,6 +55,10 @@
           </template>
         </q-input>
       </q-form>
+
+      <div v-if="isLate" class="text-warning event-form__warning">
+        {{ $t('messages.is_late_creation') }}
+      </div>
     </q-card-section>
 
     <q-card-actions align="between">
@@ -72,6 +76,7 @@
         color="primary"
         icon="event"
         :label="submitButtonText"
+        :disabled="isLate"
         @click="$emit('submit')"
       />
     </q-card-actions>
@@ -101,6 +106,10 @@ export default {
     submitButtonText() {
       return !this.value.id ? this.$t('common.create') : this.$t('common.update')
     },
+
+    isLate() {
+      return new Date(this.value.datestamp) < new Date();
+    },
   },
 };
 </script>
@@ -111,8 +120,8 @@ $block: ".event-form";
 #{$block} {
   width: 300px;
 
-  &__form {
-    //padding: 40px;
+  &__warning {
+    margin-top: 16px;
   }
 }
 </style>

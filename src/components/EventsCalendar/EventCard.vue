@@ -154,7 +154,7 @@ export default {
     },
 
     isSanitary() {
-      return this.evt.type === "sanitary";
+      return this.evt.type === "sanitary" || this.evt.type === "cleaning";
     },
 
     isEventReserved() {

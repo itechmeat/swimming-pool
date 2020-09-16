@@ -63,5 +63,6 @@ export default {
   messages: {
     is_reserved_day: "You have already registered for the event that day",
     is_too_far: "You cannot register for the event more than one month",
+    is_late_creation: "You cannot create events in the past",
   },
 };

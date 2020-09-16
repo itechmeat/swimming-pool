@@ -33,7 +33,7 @@ import { mapGetters } from "vuex";
 import { GET_USER } from "src/store/modules/user/types";
 import { GET_EVENT_BY_ID } from "src/store/modules/events/types";
 import { isCssColor, luminosity } from "src/libs/utils";
-import {fillEvent, getCounterColor} from "src/libs/events";
+import { fillEvent, getCounterColor } from "src/libs/events";
 
 export default {
   name: "EventsCalendarBadge",
@@ -79,7 +79,7 @@ export default {
     },
 
     isSanitary() {
-      return this.evt.type === "sanitary";
+      return this.evt.type === "sanitary" || this.evt.type === "cleaning";
     },
 
     isLate() {

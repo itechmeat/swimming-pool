@@ -63,5 +63,6 @@ export default {
   messages: {
     is_reserved_day: "Sie haben sich an diesem Tag bereits für die Veranstaltung angemeldet",
     is_too_far: "Sie können sich nicht länger als einen Monat für die Veranstaltung anmelden",
+    is_late_creation: "Sie können in der Vergangenheit keine Ereignisse erstellen",
   },
 };

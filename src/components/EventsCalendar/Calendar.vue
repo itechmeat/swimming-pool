@@ -5,7 +5,8 @@
       v-model="selectedDate"
       view="week"
       :locale="$i18n.locale"
-      disabled-before="2020-09-10"
+      :disabled-before="yesterday"
+      :disabled-after="nextMonth"
       :weekdays="[1,2,3,4,5,6,0]"
       enable-outside-days
       :hour24-format="isHour24Format"
@@ -106,6 +107,16 @@ export default {
       const locales = ['en'];
       return locales.includes(this.$i18n.locale);
     },
+
+    yesterday() {
+      const yesterday = date.subtractFromDate(new Date(), { days: 1 });
+      return date.formatDate(yesterday, 'YYYY-MM-DD');
+    },
+
+    nextMonth() {
+      const month = date.addToDate(new Date(), { month: 1 });
+      return date.formatDate(month, 'YYYY-MM-DD');
+    },
   },
 
   methods: {
@@ -125,9 +136,10 @@ export default {
 
     showEventsForm(evt) {
       if (!evt) {
+        const soon = date.addToDate(new Date(), { hours: 1 });
         this.editedEvent = {
           ...EMPTY_EVENT,
-          datestamp: date.formatDate(new Date(), 'YYYY-MM-DD HH:mm'),
+          datestamp: date.formatDate(soon, 'YYYY-MM-DD HH:mm'),
         };
       } else {
         this.editedEvent = { ...evt };
