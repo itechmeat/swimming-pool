@@ -8,6 +8,7 @@ export default {
     finished: "Finished",
     reserve: "Reserve",
     visitors: "visitors",
+    today: "Today",
   },
   events: {
     default: {

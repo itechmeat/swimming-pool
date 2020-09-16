@@ -132,13 +132,6 @@ export default {
       return fillEvent(event);
     },
 
-    canEdit() {
-      if (!this.user) {
-        return;
-      }
-      return this.user.username === this.evt.author || this.isAdmin;
-    },
-
     endTime() {
       return date.formatDate(this.evt.endTime, "HH:mm");
     },
@@ -151,6 +144,13 @@ export default {
     isTooFar() {
       const farDate = date.addToDate(new Date(), { month: 1 }).getTime();
       return farDate < this.evt.startTime;
+    },
+
+    canEdit() {
+      if (!this.user || this.isLate) {
+        return;
+      }
+      return this.user.username === this.evt.author || this.isAdmin;
     },
 
     isSanitary() {

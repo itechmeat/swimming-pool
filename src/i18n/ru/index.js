@@ -8,6 +8,7 @@ export default {
     finished: "Завершено",
     reserve: "Записаться",
     visitors: "Пловцов",
+    today: "Сегодня",
   },
   events: {
     default: {
