@@ -7,14 +7,23 @@ const namespaced = true;
 
 const state = () => ({
   isLoading: false,
+  isAuthFormActive: false,
   authState: undefined,
   user: undefined,
 });
 
 const getters = {
   [TYPES.GET_LOADING]: (state) => state.isLoading,
+  [TYPES.GET_AUTH_FORM_STATE]: (state) => state.isAuthFormActive,
   [TYPES.GET_USER]: (state) => state.user,
   [TYPES.GET_AUTH]: (state) => state.authState,
+
+  [TYPES.IS_ADMIN]: (state) => {
+    if (!state.user || !state.user.signInUserSession) {
+      return;
+    }
+    return state.user.signInUserSession.accessToken.payload["cognito:groups"].includes("admins")
+  },
 };
 
 const mutations = {
@@ -24,6 +33,10 @@ const mutations = {
 
   [TYPES.SET_USER]: (state, payload) => {
     state.user = payload;
+  },
+
+  [TYPES.SET_AUTH_FORM_STATE]: (state, payload) => {
+    state.isAuthFormActive = payload;
   },
 
   [TYPES.SET_AUTH]: (state, payload) => {

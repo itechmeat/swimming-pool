@@ -44,6 +44,8 @@ const TEMPLATES = {
   },
 };
 
+const ALLOWED_KEYS = ["id", "type", "title", "description", "note", "datestamp", "duration", "visitors"]
+
 const addContent = (key, item) => {
   if (!item[key]) {
     item[key] = i18n.t(`events.${item.type}.${key}`)
@@ -51,11 +53,17 @@ const addContent = (key, item) => {
 }
 
 export function fillEvent(event) {
+  const duration = event.duration || 60
+  const startTime = new Date(event.datestamp).getTime();
+  const endTime = startTime + (event.duration * 60000);
+
   const result = {
     ...event,
+    startTime,
+    endTime,
+    duration,
     date: date.formatDate(event.datestamp, "YYYY-MM-DD"),
     time: date.formatDate(event.datestamp, "HH:mm"),
-    duration: event.duration || 60,
     visitors: event.visitors || [],
   }
 
@@ -87,4 +95,32 @@ export function getCounterColor(num) {
     default:
       return "blue-grey-8";
   }
+}
+
+export function getEventTypes() {
+  return Object.keys(TEMPLATES);
+}
+
+export function resolveEvent(event) {
+  const result = {};
+
+  ALLOWED_KEYS.forEach((key) => {
+    let value = event[key];
+
+    if (!value) {
+      return;
+    }
+
+    if (value.length === 0) {
+      if (Array.isArray(value)) {
+        value = []
+      } else {
+        value = null
+      }
+    }
+
+    result[key] = value;
+  })
+
+  return result;
 }

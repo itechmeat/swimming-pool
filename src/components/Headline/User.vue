@@ -18,7 +18,7 @@
           <q-item clickable>
             <q-item-section>Settings</q-item-section>
           </q-item>
-          <q-item clickable @click="logout">
+          <q-item clickable @click="signOut">
             <q-item-section>Sign out</q-item-section>
           </q-item>
         </q-list>
@@ -30,29 +30,17 @@
       color="white"
       text-color="black"
       label="Sign In"
-      @click="dialog = !dialog"
+      @click="setAuthFormState(true)"
     />
-
-    <q-dialog v-if="!user" v-model="dialog">
-      <div class="user__form">
-        <amplify-authenticator v-if="authState !== 'signedin'" />
-      </div>
-    </q-dialog>
   </div>
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
-import { GET_USER, GET_AUTH } from "src/store/modules/user/types";
+import {mapGetters, mapActions, mapMutations} from "vuex";
+import { GET_USER, GET_AUTH, SET_AUTH_FORM_STATE } from "src/store/modules/user/types";
 
 export default {
   name: "HeadlineUser",
-
-  data() {
-    return {
-      dialog: false
-    };
-  },
 
   computed: {
     ...mapGetters("user", {
@@ -64,10 +52,9 @@ export default {
   methods: {
     ...mapActions("user", ["signOut"]),
 
-    logout() {
-      this.signOut();
-      this.dialog = false;
-    }
+    ...mapMutations("user", {
+      setAuthFormState: SET_AUTH_FORM_STATE,
+    }),
   },
 };
 </script>

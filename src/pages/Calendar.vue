@@ -1,48 +1,63 @@
 <template>
-  <div class="calendar">
+  <div class="calendar-page">
     <div class="row justify-center items-center">
-      <q-btn flat label="Prev" @click="calendarPrev" />
+      <q-btn
+        flat
+        icon="arrow_back"
+        @click="calendarPrev"
+      />
+
       <q-separator vertical />
-      <q-btn flat label="Next" @click="calendarNext" />
+
+      <q-btn
+        v-if="user"
+        flat
+        :label="$t('labels.add_event')"
+        color="teal"
+        @click="addEvent"
+      />
+
+      <q-separator v-if="user" vertical />
+
+      <q-btn
+        flat
+        icon="arrow_forward"
+        @click="calendarNext"
+      />
     </div>
     <q-separator />
 
-    <events-calendar
-      ref="calendar"
-      :events="events"
-      @select="selectEvent"
-    />
+    <events-calendar ref="calendar" :events="events" />
 
     <q-inner-loading :showing="isLoading" />
-
-    <q-dialog v-model="dialog">
-      <event-card :value="visibleEvent" />
-    </q-dialog>
   </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
+import { GET_USER } from "src/store/modules/user/types";
 import { GET_EVENTS, GET_LOADING } from "src/store/modules/events/types";
-import EventsCalendar from "src/components/EventsCalendar/Calendar"
-import EventCard from "src/components/EventsCalendar/EventCard"
+import EventsCalendar from "src/components/EventsCalendar/Calendar";
 
 export default {
   name: "CalendarPage",
 
   components: {
     EventsCalendar,
-    EventCard,
   },
 
   data () {
     return {
       dialog: false,
-      visibleEvent: null,
+      visibleEventId: null,
     };
   },
 
   computed: {
+    ...mapGetters("user", {
+      user: GET_USER,
+    }),
+
     ...mapGetters("events", {
       isLoading: GET_LOADING,
       events: GET_EVENTS,
@@ -51,25 +66,22 @@ export default {
 
   methods: {
     calendarNext () {
-      this.$refs.calendar.calendarNext()
+      this.$refs.calendar.calendarNext();
     },
 
     calendarPrev () {
-      this.$refs.calendar.calendarPrev()
+      this.$refs.calendar.calendarPrev();
     },
 
-    selectEvent(ev) {
-      this.visibleEvent = ev;
-      this.$nextTick(() => {
-        this.dialog = true;
-      })
+    addEvent () {
+      this.$refs.calendar.showEventsForm();
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-$block: ".calendar";
+$block: ".calendar-page";
 
 #{$block} {
   position: relative;

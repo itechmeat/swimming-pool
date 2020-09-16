@@ -1,9 +1,13 @@
 export default {
   common: {
+    create: "Создать",
+    update: "Обновить",
     close: "Закрыть",
+    delete: "Удалить",
+    revoke: "Отменить",
     finished: "Завершено",
     reserve: "Записаться",
-    visitors: "Пловцов"
+    visitors: "Пловцов",
   },
   events: {
     default: {
@@ -46,5 +50,19 @@ export default {
       title: "Санитарный день",
       details: "Заведение не работает",
     },
+  },
+  labels: {
+    not_necessary: "Не обязательно",
+    event_type: "Тип события",
+    title: "Название",
+    description: "Описание",
+    note: "Дополнительно",
+    duration: "Длительность",
+    add_event: "Добавить событие",
+  },
+  messages: {
+    is_reserved_day: "Вы уже регистрировались на мероприятие в этот день",
+    is_too_far: "Вы не можете зарегистрироваться на мероприятие далее одного месяца",
+    is_late_creation: "Вы не можете создавать события в прошлом",
   },
 };

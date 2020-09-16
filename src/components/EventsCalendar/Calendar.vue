@@ -1,48 +1,76 @@
 <template>
-  <q-calendar
-    ref="calendar"
-    v-model="selectedDate"
-    view="week"
-    :locale="$i18n.locale"
-    disabled-before="2020-09-10"
-    :weekdays="[1,2,3,4,5,6,0]"
-    enable-outside-days
-    :hour24-format="isHour24Format"
-    :shortIntervalLabel="isShortIntervalLabel"
-    animated
-    :intervalStart="11"
-    :intervalMinutes="30"
-    :intervalHeight="24"
-    :intervalCount="34"
-    transition-prev="slide-right"
-    transition-next="slide-left"
-    bordered
-    @click:time.self="handleTimeClick"
-  >
-    <template #day-body="{ timestamp, timeStartPos, timeDurationHeight }">
-      <template v-for="(event, index) in getEvents(timestamp.date)">
-        <calendar-badge
-          v-if="event.time"
-          :key="index"
-          :event="event"
-          :time-start-pos="timeStartPos"
-          :time-duration-height="timeDurationHeight"
-          @select="selectEvent"
-        />
+  <div class="calendar">
+    <q-calendar
+      ref="calendar"
+      v-model="selectedDate"
+      view="week"
+      :locale="$i18n.locale"
+      :disabled-before="yesterday"
+      :disabled-after="nextMonth"
+      :weekdays="[1,2,3,4,5,6,0]"
+      enable-outside-days
+      :hour24-format="isHour24Format"
+      :shortIntervalLabel="isShortIntervalLabel"
+      animated
+      :intervalStart="11"
+      :intervalMinutes="30"
+      :intervalHeight="24"
+      :intervalCount="34"
+      transition-prev="slide-right"
+      transition-next="slide-left"
+      bordered
+      @click:time.self="handleTimeClick"
+    >
+      <template #day-body="{ timestamp, timeStartPos, timeDurationHeight }">
+        <template v-for="(event, index) in getEvents(timestamp.date)">
+          <calendar-badge
+            v-if="event.time"
+            :key="index"
+            :id="event.id"
+            :side="event.side"
+            :time-start-pos="timeStartPos"
+            :time-duration-height="timeDurationHeight"
+            @select="selectEvent"
+          />
+        </template>
       </template>
-    </template>
-  </q-calendar>
+    </q-calendar>
+
+    <q-dialog v-model="eventDialog">
+      <event-card :id="visibleEventId" @close="eventDialog = false" @edit="showEventsForm" />
+    </q-dialog>
+
+    <q-dialog v-model="formDialog">
+      <event-form v-model="editedEvent" @submit="submitEvent" />
+    </q-dialog>
+  </div>
 </template>
 
 <script>
+import { mapActions } from "vuex";
 import { fillEvent } from "src/libs/events";
 import CalendarBadge from "./Badge"
+import EventCard from "src/components/EventsCalendar/EventCard"
+import EventForm from "src/components/EventsCalendar/EventForm"
+import { date } from "quasar";
+
+const EMPTY_EVENT = {
+  type: "swimming",
+  title: null,
+  description: null,
+  note: null,
+  datestamp: null,
+  duration: 60,
+  visitors: [],
+}
 
 export default {
   name: "EventsCalendar",
 
   components: {
     CalendarBadge,
+    EventCard,
+    EventForm,
   },
 
   props: {
@@ -56,6 +84,10 @@ export default {
     return {
       date: '',
       selectedDate: '',
+      eventDialog: false,
+      visibleEventId: null,
+      formDialog: false,
+      editedEvent: null,
     };
   },
 
@@ -74,24 +106,72 @@ export default {
     isShortIntervalLabel() {
       const locales = ['en'];
       return locales.includes(this.$i18n.locale);
-    }
+    },
+
+    yesterday() {
+      const yesterday = date.subtractFromDate(new Date(), { days: 1 });
+      return date.formatDate(yesterday, 'YYYY-MM-DD');
+    },
+
+    nextMonth() {
+      const month = date.addToDate(new Date(), { month: 1 });
+      return date.formatDate(month, 'YYYY-MM-DD');
+    },
   },
 
   methods: {
+    ...mapActions("events", ["createEvent", "updateEvent"]),
+
     handleTimeClick(info) {
-      console.log('handleTimeClick', info)
+      console.log('handleTimeClick', info);
     },
 
-    calendarNext () {
-      this.$refs.calendar.next()
+    calendarNext() {
+      this.$refs.calendar.next();
     },
 
-    calendarPrev () {
-      this.$refs.calendar.prev()
+    calendarPrev() {
+      this.$refs.calendar.prev();
     },
 
-    selectEvent(ev) {
-      this.$emit("select", ev);
+    showEventsForm(evt) {
+      if (!evt) {
+        const soon = date.addToDate(new Date(), { hours: 1 });
+        this.editedEvent = {
+          ...EMPTY_EVENT,
+          datestamp: date.formatDate(soon, 'YYYY-MM-DD HH:mm'),
+        };
+      } else {
+        this.editedEvent = { ...evt };
+      }
+      this.$nextTick(() => {
+        this.formDialog = true;
+      })
+    },
+
+    async submitEvent() {
+      let response;
+
+      if (!this.editedEvent.id) {
+        response = await this.createEvent(this.editedEvent)
+      } else {
+        response = await this.updateEvent(this.editedEvent)
+      }
+
+      if (!response) {
+        return;
+      }
+
+      this.editedEvent = null;
+      this.formDialog = false;
+      this.eventDialog = false;
+    },
+
+    selectEvent(eventId) {
+      this.visibleEventId = eventId;
+      this.$nextTick(() => {
+        this.eventDialog = true;
+      })
     },
 
     getEvents(dt) {

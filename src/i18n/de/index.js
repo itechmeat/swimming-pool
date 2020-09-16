@@ -1,9 +1,13 @@
 export default {
   common: {
+    create: "Erstellen",
+    update: "Aktualisieren",
     close: "Schließen",
+    delete: "Löschen",
+    revoke: "Widerrufen",
     finished: "Abgeschlossen",
     reserve: "Anmelden",
-    visitors: "Besucher"
+    visitors: "Besucher",
   },
   events: {
     default: {
@@ -46,5 +50,19 @@ export default {
       title: "Hygienetag",
       details: "Die Einrichtung funktioniert nicht",
     },
+  },
+  labels: {
+    not_necessary: "Nicht nötig",
+    event_type: "Art des Ereignisses",
+    title: "Titel",
+    description: "Beschreibung",
+    note: "Hinweis",
+    duration: "Dauer",
+    add_event: "Ereignis hinzufügen",
+  },
+  messages: {
+    is_reserved_day: "Sie haben sich an diesem Tag bereits für die Veranstaltung angemeldet",
+    is_too_far: "Sie können sich nicht länger als einen Monat für die Veranstaltung anmelden",
+    is_late_creation: "Sie können in der Vergangenheit keine Ereignisse erstellen",
   },
 };
