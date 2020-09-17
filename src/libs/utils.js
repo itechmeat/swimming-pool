@@ -19,3 +19,8 @@ export function luminosity (color) {
 export function isCssColor (color) {
   return !!color && !!color.match(/^(#|(rgb|hsl)a?\()/)
 }
+
+export function randomInteger (min, max) {
+  let rand = min + Math.random() * (max + 1 - min);
+  return Math.floor(rand);
+}

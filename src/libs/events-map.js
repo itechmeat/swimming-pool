@@ -1,4 +1,5 @@
 import { date } from "quasar";
+import { randomInteger } from "src/libs/utils";
 
 const week = [
   {
@@ -264,7 +265,7 @@ const findLastDateOfMonth = (monday) => {
   return lastDate;
 }
 
-export default function buildEvents(monday, withVisitors) {
+export default function buildEvents(monday, profiles) {
   const lastDate = findLastDateOfMonth(monday);
 
   const eventsList = week.map((eventTypes) => {
@@ -277,12 +278,17 @@ export default function buildEvents(monday, withVisitors) {
       }
 
       return day.events.map((evt) => {
-        const visitors = []
+        let visitors = [];
+
+        if (profiles && profiles.length > 0) {
+          visitors = getRandomVisitors(evt.visitors, profiles);
+        }
 
         return {
           type: eventTypes.type,
           datestamp: formattedDate + " " + evt.time,
           duration: evt.duration || 60,
+          test: evt.visitors,
           visitors,
         };
       }).filter(Boolean);
@@ -300,7 +306,18 @@ export default function buildEvents(monday, withVisitors) {
     });
   }
 
-  console.log('map', result);
+  return result;
+}
+
+const getRandomVisitors = (n, profiles) => {
+  const result = [];
+
+  for (; result.length < n;) {
+    const profile = profiles[randomInteger(0, profiles.length)];
+    if (profile) {
+      result.push(profile.id);
+    }
+  }
 
   return result;
 }

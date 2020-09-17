@@ -12,7 +12,7 @@
       <q-btn color="warning" label="Generate Profiles" @click="generateProfiles" />
     </div>
 
-    <div class="generator__row">
+    <div v-if="false" class="generator__row">
       <hr />
       <br />
       <br />
@@ -49,10 +49,11 @@ export default {
   },
 
   methods: {
-    ...mapActions("user", ["createProfile", "fetchProfile"]),
+    ...mapActions("user", ["createProfile", "fetchProfile", "fetchProfiles"]),
     ...mapActions("events", ["createEvent"]),
 
     async getProfile() {
+      console.log(this.$store.getters["user/GET_PROFILES"])
       const res = await this.fetchProfile("02b79152-4cb4-4438-a621-b8e6176c312f");
       console.log(res)
     },
@@ -84,8 +85,11 @@ export default {
       });
     },
 
-    generateEvents() {
-      const events = buildEvents(this.monday, true);
+    async generateEvents() {
+      const profiles = await this.fetchProfiles();
+      console.log('profiles', profiles);
+      const events = await buildEvents(this.monday, profiles);
+      console.log('events', events);
       events.forEach((event) => {
         this.createEvent(event)
       })

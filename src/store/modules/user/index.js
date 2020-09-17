@@ -2,7 +2,7 @@ import Amplify, { API, graphqlOperation } from "@aws-amplify/api";
 import { Auth } from "aws-amplify";
 import awsConfig from "src/aws-exports";
 import { createProfile } from "src/graphql/mutations";
-import { getProfile } from "src/graphql/queries";
+import { getProfile, listProfiles } from "src/graphql/queries";
 Amplify.configure(awsConfig);
 
 import * as TYPES from "./types";
@@ -29,6 +29,8 @@ const getters = {
     }
     return state.user.signInUserSession.accessToken.payload["cognito:groups"].includes("admins")
   },
+
+  [TYPES.GET_PROFILES]: (state) => state.profiles,
 };
 
 const mutations = {
@@ -80,12 +82,32 @@ const actions = {
     }
   },
 
-  async fetchProfile({ commit }, id) {
+  async fetchProfiles() {
+    try {
+      let result
+      await API.graphql(graphqlOperation(listProfiles, { limit: 200 })).then((evt) => {
+        result = evt.data.listProfiles.items;
+      });
+      return result;
+    } catch (error) {
+      console.error(error)
+      return [];
+    }
+  },
+
+  async fetchProfile({ commit, state }, id) {
+    const profile = state.profiles.find((item) => item.id === id);
+
+    if (profile) {
+      return profile;
+    }
+
     try {
       const { data } = await API.graphql(graphqlOperation(getProfile, { id }));
+      commit("SET_PROFILE", data.getProfile);
       return data.getProfile;
     } catch(error) {
-      console.log('profile', error)
+      console.error('profile', error)
       return false;
     }
   },
