@@ -1,15 +1,11 @@
 <template>
   <q-item class="visitor">
-    <template v-if="profileData">
-      <q-item-section avatar>
-        <q-avatar>
-          <img :src="profileData.photo">
-        </q-avatar>
-      </q-item-section>
-      <q-item-section>{{ profileData.firstName }} {{ profileData.lastName }}</q-item-section>
-    </template>
-
-    <q-item-section v-else>Unknown User</q-item-section>
+    <q-item-section avatar>
+      <q-avatar>
+        <img :src="profilePhoto">
+      </q-avatar>
+    </q-item-section>
+    <q-item-section>{{ profileName }}</q-item-section>
 
     <q-space />
 
@@ -53,7 +49,26 @@ export default {
         return;
       }
       return this.profile(this.id);
-    }
+    },
+
+    profileName() {
+      if (!this.profileData) {
+        return "Unknown User";
+      }
+      if (!this.profileData.firstName && !this.profileData.lastName) {
+        return this.profileData.email || "Unnamed User";
+      }
+
+      return this.profileData.firstName + " " + this.profileData.lastName;
+    },
+
+    profilePhoto() {
+      if (!this.profileData) {
+        return "/images/placeholder_avatar.jpg";
+      }
+
+      return this.profileData.photo;
+    },
   },
 
   watch: {

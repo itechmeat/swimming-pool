@@ -12,7 +12,7 @@
       <q-btn color="warning" label="Generate Profiles" @click="generateProfiles" />
     </div>
 
-    <div class="generator__row">
+    <div v-if="false" class="generator__row">
       <hr />
       <br />
       <br />
