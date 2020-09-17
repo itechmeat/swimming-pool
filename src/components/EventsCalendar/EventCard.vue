@@ -27,7 +27,8 @@
         :color="counterColor"
         :label="evt.visitors.length"
         class="event-card__counter"
-        @click="$emit('show-visitors', evt.visitors)"
+        :disabled="evt.visitors.length === 0"
+        @click="$emit('show-visitors')"
       />
 
       <div class="row no-wrap items-center">
@@ -65,6 +66,9 @@
       </div>
       <div v-if="isTooFar" class="text-warning">
         {{ $t('messages.is_too_far') }}
+      </div>
+      <div v-if="evt.description" class="text-caption">
+        {{ evt.description }}
       </div>
       <div v-if="evt.note" class="text-caption text-grey">
         {{ evt.note }}

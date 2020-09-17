@@ -64,7 +64,7 @@
     >
       <event-card
         :id="visibleEventId"
-        @show-visitors="showVisitors"
+        @show-visitors="visitorsDialog = true"
         @close="eventDialog = false"
         @edit="showEventsForm"
       />
@@ -72,9 +72,11 @@
 
     <q-dialog
       v-model="visitorsDialog"
-      @hide="visitorsList = []"
     >
-      <event-visitors :value="visitorsList" />
+      <event-visitors
+        :event-id="visibleEventId"
+        @close="visitorsDialog = false"
+      />
     </q-dialog>
 
     <q-dialog
@@ -132,7 +134,6 @@ export default {
       formDialog: false,
       editedEvent: null,
       visitorsDialog: false,
-      visitorsList: [],
     };
   },
 
@@ -302,13 +303,6 @@ export default {
       })
 
       return events;
-    },
-
-    showVisitors(visitors) {
-      this.visitorsList = visitors;
-      this.$nextTick(() => {
-        this.visitorsDialog = true;
-      })
     },
   },
 };

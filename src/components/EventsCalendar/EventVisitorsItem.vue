@@ -1,6 +1,6 @@
 <template>
-  <q-item v-if="profileData" clickable v-ripple>
-    <template>
+  <q-item class="visitor">
+    <template v-if="profileData">
       <q-item-section avatar>
         <q-avatar>
           <img :src="profileData.photo">
@@ -8,6 +8,23 @@
       </q-item-section>
       <q-item-section>{{ profileData.firstName }} {{ profileData.lastName }}</q-item-section>
     </template>
+
+    <q-item-section v-else>Unknown User</q-item-section>
+
+    <q-space />
+
+    <q-item-section>
+      <div class="visitor__actions">
+        <q-btn
+          v-if="canDelete"
+          round
+          size="sm"
+          color="negative"
+          icon="delete"
+          @click="$emit('delete', id)"
+        />
+      </div>
+    </q-item-section>
   </q-item>
 </template>
 
@@ -23,6 +40,7 @@ export default {
       type: String,
       required: true,
     },
+    canDelete: Boolean,
   },
 
   computed: {
@@ -60,5 +78,17 @@ export default {
 $block: ".visitor";
 
 #{$block} {
+  &:hover {
+    background: #dadada;
+  }
+
+  &__actions {
+    text-align: right;
+    opacity: .1;
+
+    #{$block}:hover & {
+      opacity: 1;
+    }
+  }
 }
 </style>
