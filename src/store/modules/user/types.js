@@ -6,4 +6,5 @@ export const SET_USER = "SET_USER";
 export const GET_USER = "GET_USER";
 export const SET_AUTH = "SET_AUTH";
 export const GET_AUTH = "GET_AUTH";
+export const SET_PROFILE = "SET_PROFILE";
 export const IS_ADMIN = "IS_ADMIN";

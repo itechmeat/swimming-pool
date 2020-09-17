@@ -1,5 +1,9 @@
+import Amplify, { API, graphqlOperation } from "@aws-amplify/api";
 import { Auth } from "aws-amplify";
-import axios from "axios";
+import awsConfig from "src/aws-exports";
+import { createProfile } from "src/graphql/mutations";
+import { getProfile } from "src/graphql/queries";
+Amplify.configure(awsConfig);
 
 import * as TYPES from "./types";
 
@@ -10,6 +14,7 @@ const state = () => ({
   isAuthFormActive: false,
   authState: undefined,
   user: undefined,
+  profiles: [],
 });
 
 const getters = {
@@ -42,32 +47,13 @@ const mutations = {
   [TYPES.SET_AUTH]: (state, payload) => {
     state.authState = payload;
   },
+
+  [TYPES.SET_PROFILE]: (state, payload) => {
+    state.profiles.push(payload);
+  },
 };
 
 const actions = {
-  async regUser({ commit }, data) {
-    commit("SET_LOADING", true);
-    try {
-      const response = await axios.post("auth/register", data);
-      commit("SET_USER", {});
-    } catch (err) {
-      commit("SET_LOADING", false);
-    }
-  },
-
-  async login({ commit }, data) {
-    commit("SET_LOADING", true);
-    try {
-      const response = await axios.post("auth/login", data);
-      commit("SET_USER", {});
-      commit("SET_LOADING", false);
-    } catch (err) {
-      console.log("catch");
-      commit("SET_LOADING", false);
-      commit("SET_USER", null);
-    }
-  },
-
   async signOut({ commit }) {
     try {
       await Auth.signOut();
@@ -75,6 +61,33 @@ const actions = {
       console.log('error signing out: ', error);
     }
     commit("SET_USER", null);
+  },
+
+  async createProfile({ commit, dispatch }, profile) {
+    commit("SET_LOADING", true);
+
+    try {
+      const { data } = await API.graphql(
+        graphqlOperation(createProfile, { input: profile })
+      );
+
+      commit("SET_LOADING", false);
+      return data;
+    } catch (error) {
+      console.log('createProfile', error)
+      commit("SET_LOADING", false);
+      return false;
+    }
+  },
+
+  async fetchProfile({ commit }, id) {
+    try {
+      const { data } = await API.graphql(graphqlOperation(getProfile, { id }));
+      return data.getProfile;
+    } catch(error) {
+      console.log('profile', error)
+      return false;
+    }
   },
 };
 

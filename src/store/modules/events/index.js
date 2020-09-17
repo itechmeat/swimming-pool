@@ -78,7 +78,7 @@ const actions = {
     }
   },
 
-  async createEvent({ commit, dispatch, rootState }, event) {
+  async createEvent({ commit, rootState }, event) {
     commit("SET_LOADING", true);
 
     const usersEvent = {
@@ -91,7 +91,6 @@ const actions = {
         graphqlOperation(createEvent, { input: usersEvent })
       );
 
-      dispatch("fetchEvents");
       commit("SET_LOADING", false);
       return true;
     } catch (e) {
