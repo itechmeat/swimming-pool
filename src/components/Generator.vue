@@ -12,7 +12,16 @@
       <q-btn color="warning" label="Generate Profiles" @click="generateProfiles" />
     </div>
 
-    <div v-if="false" class="generator__row">
+    <div class="generator__row">
+      <hr />
+      <br />
+      <br />
+      <q-input
+        v-model="monday"
+        label="Input any monday in format '2020-09-14'"
+        style="width: 240px;"
+      />
+      <br />
       <q-btn color="negative" label="Generate Events" @click="generateEvents" />
     </div>
   </div>
@@ -22,11 +31,16 @@
 import axios from "axios";
 import { mapGetters, mapActions } from "vuex";
 import { GET_EVENTS } from "src/store/modules/events/types";
-import { v4 as uuidv4 } from "uuid";
-import EVENTS from "src/assets/events";
+import buildEvents from "src/libs/events-map";
 
 export default {
   name: "EventsTmp",
+
+  data() {
+    return {
+      monday: "2020-09-14",
+    };
+  },
 
   computed: {
     ...mapGetters("events", {
@@ -71,32 +85,10 @@ export default {
     },
 
     generateEvents() {
-      EVENTS.forEach((event, index) => {
-        // if (index > 10) {
-        //   return;
-        // }
-        const visitors = [];
-        if (event.visitors && event.visitors > 0) {
-          for (let i = 0; i < event.visitors; i++) {
-            visitors.push(uuidv4());
-          }
-        }
-
-        const datestamp = new Date(event.date + ' ' + event.time);
-
-        const result = {
-          ...event,
-          datestamp,
-          visitors,
-        };
-
-        delete result.date;
-        delete result.time;
-
-        console.log(result)
-
-        this.createEvent(result)
-      });
+      const events = buildEvents(this.monday, true);
+      events.forEach((event) => {
+        this.createEvent(event)
+      })
     },
   },
 };

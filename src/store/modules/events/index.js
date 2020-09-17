@@ -63,11 +63,20 @@ const mutations = {
 };
 
 const actions = {
-  fetchEvents({ commit }) {
+  fetchEvents({ commit }, dates) {
     commit("SET_LOADING", true);
 
+    let filter;
+    if (dates && dates.from && dates.to) {
+      filter = {
+        datestamp: {
+          between: [dates.from, dates.to]
+        }
+      }
+    }
+
     try {
-      API.graphql(graphqlOperation(listEvents)).then((evt) => {
+      API.graphql(graphqlOperation(listEvents, { filter, limit: 300 })).then((evt) => {
         commit("SET_EVENTS", evt.data.listEvents.items);
         commit("SET_LOADING", false);
       });

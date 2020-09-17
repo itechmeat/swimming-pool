@@ -158,7 +158,7 @@ export default {
     },
 
     isEventReserved() {
-      if (!this.user) {
+      if (!this.user || !this.evt.visitors) {
         return;
       }
       return this.evt.visitors.includes(this.user.username);

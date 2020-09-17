@@ -20,6 +20,7 @@
       transition-next="slide-left"
       bordered
       @click:time.self="handleTimeClick"
+      @change="getRange"
     >
       <template #day-header="{ timestamp }">
         <div
@@ -110,6 +111,10 @@ export default {
     };
   },
 
+  created() {
+    this.subscribe();
+  },
+
   computed: {
     ...mapGetters("events", {
       isDayReserved: IS_DAY_RESERVED,
@@ -151,7 +156,14 @@ export default {
   },
 
   methods: {
-    ...mapActions("events", ["createEvent", "updateEvent"]),
+    ...mapActions("events", ["fetchEvents", "createEvent", "updateEvent", "subscribe"]),
+
+    getRange(range) {
+      this.fetchEvents({
+        from: range.start.date,
+        to: range.end.date + "23:59",
+      });
+    },
 
     getReservedStatus (timestamp) {
       return this.isDayReserved(timestamp.date);
