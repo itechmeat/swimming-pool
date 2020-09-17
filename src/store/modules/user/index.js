@@ -31,6 +31,7 @@ const getters = {
   },
 
   [TYPES.GET_PROFILES]: (state) => state.profiles,
+  [TYPES.GET_PROFILE_BY_ID]: (state) => (id) => state.profiles.find((profile) => profile.id === id),
 };
 
 const mutations = {
@@ -96,6 +97,10 @@ const actions = {
   },
 
   async fetchProfile({ commit, state }, id) {
+    if (!id) {
+      return;
+    }
+
     const profile = state.profiles.find((item) => item.id === id);
 
     if (profile) {
@@ -104,11 +109,14 @@ const actions = {
 
     try {
       const { data } = await API.graphql(graphqlOperation(getProfile, { id }));
+      if (!data.getProfile) {
+        return null;
+      }
       commit("SET_PROFILE", data.getProfile);
       return data.getProfile;
     } catch(error) {
-      console.error('profile', error)
-      return false;
+      console.error('profile', error);
+      return null;
     }
   },
 };

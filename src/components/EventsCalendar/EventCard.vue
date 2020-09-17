@@ -27,6 +27,7 @@
         :color="counterColor"
         :label="evt.visitors.length"
         class="event-card__counter"
+        @click="$emit('show-visitors', evt.visitors)"
       />
 
       <div class="row no-wrap items-center">
@@ -256,7 +257,6 @@ $block: ".event-card";
     right: 12px;
     font-size: 24px;
     line-height: 1;
-    pointer-events: none;
     transform: translateY(-50%);
   }
 

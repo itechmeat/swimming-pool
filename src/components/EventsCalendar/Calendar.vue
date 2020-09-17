@@ -23,6 +23,9 @@
       @change="getRange"
     >
       <template #day-header="{ timestamp }">
+        <span class="calendar__month">
+          {{ getMonth(timestamp) }}
+        </span>
         <div
           v-if="getReservedStatus(timestamp)"
           class="calendar__status text-primary"
@@ -55,11 +58,29 @@
       @click="backToday"
     />
 
-    <q-dialog v-model="eventDialog">
-      <event-card :id="visibleEventId" @close="eventDialog = false" @edit="showEventsForm" />
+    <q-dialog
+      v-model="eventDialog"
+      @hide="visibleEventId = null"
+    >
+      <event-card
+        :id="visibleEventId"
+        @show-visitors="showVisitors"
+        @close="eventDialog = false"
+        @edit="showEventsForm"
+      />
     </q-dialog>
 
-    <q-dialog v-model="formDialog">
+    <q-dialog
+      v-model="visitorsDialog"
+      @hide="visitorsList = []"
+    >
+      <event-visitors :value="visitorsList" />
+    </q-dialog>
+
+    <q-dialog
+      v-model="formDialog"
+      @hide="editedEvent = null"
+    >
       <event-form v-model="editedEvent" @submit="submitEvent" />
     </q-dialog>
   </div>
@@ -71,6 +92,7 @@ import { IS_DAY_RESERVED } from "src/store/modules/events/types";
 import { fillEvent } from "src/libs/events";
 import CalendarBadge from "./Badge"
 import EventCard from "src/components/EventsCalendar/EventCard"
+import EventVisitors from "src/components/EventsCalendar/EventVisitors"
 import EventForm from "src/components/EventsCalendar/EventForm"
 import { date } from "quasar";
 
@@ -90,6 +112,7 @@ export default {
   components: {
     CalendarBadge,
     EventCard,
+    EventVisitors,
     EventForm,
   },
 
@@ -108,6 +131,8 @@ export default {
       visibleEventId: null,
       formDialog: false,
       editedEvent: null,
+      visitorsDialog: false,
+      visitorsList: [],
     };
   },
 
@@ -165,7 +190,12 @@ export default {
       });
     },
 
-    getReservedStatus (timestamp) {
+    getMonth(timestamp) {
+      const today = new Date(timestamp.date);
+      return today.toLocaleString(this.$i18n.locale, { month: 'short' });
+    },
+
+    getReservedStatus(timestamp) {
       return this.isDayReserved(timestamp.date);
     },
 
@@ -273,6 +303,13 @@ export default {
 
       return events;
     },
+
+    showVisitors(visitors) {
+      this.visitorsList = visitors;
+      this.$nextTick(() => {
+        this.visitorsDialog = true;
+      })
+    },
   },
 };
 </script>
@@ -281,6 +318,12 @@ export default {
 $block: ".calendar";
 
 #{$block} {
+  &__month {
+    display: inline-block;
+    margin: 5px 0 0 6px;
+    vertical-align: top;
+  }
+
   &__status {
     position: absolute;
     right: 6px;

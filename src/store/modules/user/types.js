@@ -8,4 +8,5 @@ export const SET_AUTH = "SET_AUTH";
 export const GET_AUTH = "GET_AUTH";
 export const SET_PROFILE = "SET_PROFILE";
 export const GET_PROFILES = "GET_PROFILES";
+export const GET_PROFILE_BY_ID = "GET_PROFILE_BY_ID";
 export const IS_ADMIN = "IS_ADMIN";

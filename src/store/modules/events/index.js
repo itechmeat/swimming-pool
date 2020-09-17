@@ -76,7 +76,7 @@ const actions = {
     }
 
     try {
-      API.graphql(graphqlOperation(listEvents, { filter, limit: 300 })).then((evt) => {
+      API.graphql(graphqlOperation(listEvents, { filter, limit: 1000 })).then((evt) => {
         commit("SET_EVENTS", evt.data.listEvents.items);
         commit("SET_LOADING", false);
       });
