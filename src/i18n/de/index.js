@@ -8,6 +8,7 @@ export default {
     finished: "Abgeschlossen",
     reserve: "Anmelden",
     visitors: "Besucher",
+    today: "Heute",
   },
   events: {
     default: {

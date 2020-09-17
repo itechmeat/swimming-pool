@@ -20,7 +20,20 @@
       transition-next="slide-left"
       bordered
       @click:time.self="handleTimeClick"
+      @change="getRange"
     >
+      <template #day-header="{ timestamp }">
+        <span class="calendar__month">
+          {{ getMonth(timestamp) }}
+        </span>
+        <div
+          v-if="getReservedStatus(timestamp)"
+          class="calendar__status text-primary"
+        >
+          <q-icon name="done_all" />
+        </div>
+      </template>
+
       <template #day-body="{ timestamp, timeStartPos, timeDurationHeight }">
         <template v-for="(event, index) in getEvents(timestamp.date)">
           <calendar-badge
@@ -36,21 +49,52 @@
       </template>
     </q-calendar>
 
-    <q-dialog v-model="eventDialog">
-      <event-card :id="visibleEventId" @close="eventDialog = false" @edit="showEventsForm" />
+    <q-btn
+      v-if="!isCurrentWeek"
+      flat
+      color="primary"
+      class="calendar__today"
+      :label="$t('common.today')"
+      @click="backToday"
+    />
+
+    <q-dialog
+      v-model="eventDialog"
+      @hide="visibleEventId = null"
+    >
+      <event-card
+        :id="visibleEventId"
+        @show-visitors="visitorsDialog = true"
+        @close="eventDialog = false"
+        @edit="showEventsForm"
+      />
     </q-dialog>
 
-    <q-dialog v-model="formDialog">
+    <q-dialog
+      v-model="visitorsDialog"
+    >
+      <event-visitors
+        :event-id="visibleEventId"
+        @close="visitorsDialog = false"
+      />
+    </q-dialog>
+
+    <q-dialog
+      v-model="formDialog"
+      @hide="editedEvent = null"
+    >
       <event-form v-model="editedEvent" @submit="submitEvent" />
     </q-dialog>
   </div>
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapGetters, mapActions } from "vuex";
+import { IS_DAY_RESERVED } from "src/store/modules/events/types";
 import { fillEvent } from "src/libs/events";
 import CalendarBadge from "./Badge"
 import EventCard from "src/components/EventsCalendar/EventCard"
+import EventVisitors from "src/components/EventsCalendar/EventVisitors"
 import EventForm from "src/components/EventsCalendar/EventForm"
 import { date } from "quasar";
 
@@ -70,6 +114,7 @@ export default {
   components: {
     CalendarBadge,
     EventCard,
+    EventVisitors,
     EventForm,
   },
 
@@ -88,10 +133,19 @@ export default {
       visibleEventId: null,
       formDialog: false,
       editedEvent: null,
+      visitorsDialog: false,
     };
   },
 
+  created() {
+    this.subscribe();
+  },
+
   computed: {
+    ...mapGetters("events", {
+      isDayReserved: IS_DAY_RESERVED,
+    }),
+
     formattedEvents() {
       return this.events.map((event) => {
         return fillEvent(event)
@@ -108,6 +162,10 @@ export default {
       return locales.includes(this.$i18n.locale);
     },
 
+    today() {
+      return date.formatDate(Date.now(), 'YYYY-MM-DD')
+    },
+
     yesterday() {
       const yesterday = date.subtractFromDate(new Date(), { days: 1 });
       return date.formatDate(yesterday, 'YYYY-MM-DD');
@@ -117,10 +175,30 @@ export default {
       const month = date.addToDate(new Date(), { month: 1 });
       return date.formatDate(month, 'YYYY-MM-DD');
     },
+
+    isCurrentWeek() {
+      return !this.selectedDate || this.today === this.selectedDate;
+    },
   },
 
   methods: {
-    ...mapActions("events", ["createEvent", "updateEvent"]),
+    ...mapActions("events", ["fetchEvents", "createEvent", "updateEvent", "subscribe"]),
+
+    getRange(range) {
+      this.fetchEvents({
+        from: range.start.date,
+        to: range.end.date + "23:59",
+      });
+    },
+
+    getMonth(timestamp) {
+      const today = new Date(timestamp.date);
+      return today.toLocaleString(this.$i18n.locale, { month: 'short' });
+    },
+
+    getReservedStatus(timestamp) {
+      return this.isDayReserved(timestamp.date);
+    },
 
     handleTimeClick(info) {
       console.log('handleTimeClick', info);
@@ -132,6 +210,10 @@ export default {
 
     calendarPrev() {
       this.$refs.calendar.prev();
+    },
+
+    backToday() {
+      this.selectedDate = this.today;
     },
 
     showEventsForm(evt) {
@@ -225,3 +307,34 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+$block: ".calendar";
+
+#{$block} {
+  &__month {
+    display: inline-block;
+    margin: 5px 0 0 6px;
+    vertical-align: top;
+  }
+
+  &__status {
+    position: absolute;
+    right: 6px;
+    bottom: 12px;
+    font-size: 16px;
+    line-height: 1;
+    text-align: right;
+  }
+
+  &__today {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+}
+
+.q-calendar-daily__head-day {
+  position: relative;
+}
+</style>

@@ -27,6 +27,8 @@
         :color="counterColor"
         :label="evt.visitors.length"
         class="event-card__counter"
+        :disabled="evt.visitors.length === 0"
+        @click="$emit('show-visitors')"
       />
 
       <div class="row no-wrap items-center">
@@ -64,6 +66,9 @@
       </div>
       <div v-if="isTooFar" class="text-warning">
         {{ $t('messages.is_too_far') }}
+      </div>
+      <div v-if="evt.description" class="text-caption">
+        {{ evt.description }}
       </div>
       <div v-if="evt.note" class="text-caption text-grey">
         {{ evt.note }}
@@ -132,13 +137,6 @@ export default {
       return fillEvent(event);
     },
 
-    canEdit() {
-      if (!this.user) {
-        return;
-      }
-      return this.user.username === this.evt.author || this.isAdmin;
-    },
-
     endTime() {
       return date.formatDate(this.evt.endTime, "HH:mm");
     },
@@ -153,12 +151,19 @@ export default {
       return farDate < this.evt.startTime;
     },
 
+    canEdit() {
+      if (!this.user || this.isLate) {
+        return;
+      }
+      return this.user.username === this.evt.author || this.isAdmin;
+    },
+
     isSanitary() {
       return this.evt.type === "sanitary" || this.evt.type === "cleaning";
     },
 
     isEventReserved() {
-      if (!this.user) {
+      if (!this.user || !this.evt.visitors) {
         return;
       }
       return this.evt.visitors.includes(this.user.username);
@@ -256,7 +261,6 @@ $block: ".event-card";
     right: 12px;
     font-size: 24px;
     line-height: 1;
-    pointer-events: none;
     transform: translateY(-50%);
   }
 

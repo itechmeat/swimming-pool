@@ -13,7 +13,7 @@
 </template>
 <script>
 import { onAuthUIStateChange } from "@aws-amplify/ui-components";
-import { mapGetters, mapMutations, mapActions } from "vuex";
+import { mapGetters, mapMutations } from "vuex";
 import * as TYPES from "src/store/modules/user/types";
 
 export default {
@@ -30,9 +30,6 @@ export default {
       this.setAuthState(authState)
       this.setUser(authData)
     });
-
-    this.fetchEvents();
-    this.subscribe();
   },
 
   computed: {
@@ -64,8 +61,6 @@ export default {
   },
 
   methods: {
-    ...mapActions("events", ["fetchEvents", "subscribe"]),
-
     ...mapMutations("user", {
       setUser: TYPES.SET_USER,
       setAuthState: TYPES.SET_AUTH,

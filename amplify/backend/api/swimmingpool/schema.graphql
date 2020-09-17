@@ -1,7 +1,11 @@
-type Todo @model {
+type Profile @model {
   id: ID!
-  name: String!
-  description: String
+  userId: String
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
+  photo: String
 }
 
 type Event @model {

@@ -1,5 +1,9 @@
+import Amplify, { API, graphqlOperation } from "@aws-amplify/api";
 import { Auth } from "aws-amplify";
-import axios from "axios";
+import awsConfig from "src/aws-exports";
+import { createProfile } from "src/graphql/mutations";
+import { getProfile, listProfiles } from "src/graphql/queries";
+Amplify.configure(awsConfig);
 
 import * as TYPES from "./types";
 
@@ -10,6 +14,7 @@ const state = () => ({
   isAuthFormActive: false,
   authState: undefined,
   user: undefined,
+  profiles: [],
 });
 
 const getters = {
@@ -24,6 +29,9 @@ const getters = {
     }
     return state.user.signInUserSession.accessToken.payload["cognito:groups"].includes("admins")
   },
+
+  [TYPES.GET_PROFILES]: (state) => state.profiles,
+  [TYPES.GET_PROFILE_BY_ID]: (state) => (id) => state.profiles.find((profile) => profile.id === id),
 };
 
 const mutations = {
@@ -42,32 +50,13 @@ const mutations = {
   [TYPES.SET_AUTH]: (state, payload) => {
     state.authState = payload;
   },
+
+  [TYPES.SET_PROFILE]: (state, payload) => {
+    state.profiles.push(payload);
+  },
 };
 
 const actions = {
-  async regUser({ commit }, data) {
-    commit("SET_LOADING", true);
-    try {
-      const response = await axios.post("auth/register", data);
-      commit("SET_USER", {});
-    } catch (err) {
-      commit("SET_LOADING", false);
-    }
-  },
-
-  async login({ commit }, data) {
-    commit("SET_LOADING", true);
-    try {
-      const response = await axios.post("auth/login", data);
-      commit("SET_USER", {});
-      commit("SET_LOADING", false);
-    } catch (err) {
-      console.log("catch");
-      commit("SET_LOADING", false);
-      commit("SET_USER", null);
-    }
-  },
-
   async signOut({ commit }) {
     try {
       await Auth.signOut();
@@ -75,6 +64,60 @@ const actions = {
       console.log('error signing out: ', error);
     }
     commit("SET_USER", null);
+  },
+
+  async createProfile({ commit, dispatch }, profile) {
+    commit("SET_LOADING", true);
+
+    try {
+      const { data } = await API.graphql(
+        graphqlOperation(createProfile, { input: profile })
+      );
+
+      commit("SET_LOADING", false);
+      return data;
+    } catch (error) {
+      console.log('createProfile', error)
+      commit("SET_LOADING", false);
+      return false;
+    }
+  },
+
+  async fetchProfiles() {
+    try {
+      let result
+      await API.graphql(graphqlOperation(listProfiles, { limit: 200 })).then((evt) => {
+        result = evt.data.listProfiles.items;
+      });
+      return result;
+    } catch (error) {
+      console.error(error)
+      return [];
+    }
+  },
+
+  async fetchProfile({ commit, state }, id) {
+    if (!id) {
+      return;
+    }
+
+    const profile = state.profiles.find((item) => item.id === id);
+
+    if (profile) {
+      return profile;
+    }
+
+    try {
+      const { data } = await API.graphql(graphqlOperation(getProfile, { id }));
+      if (!data.getProfile) {
+        return null;
+      }
+      commit("SET_PROFILE", data.getProfile);
+      return data.getProfile;
+    } catch(error) {
+      console.error('profile', error);
+      return null;
+    }
   },
 };
 
